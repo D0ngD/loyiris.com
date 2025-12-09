@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Base64 編碼 / 解碼 | Roy Toolbox</title>
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    .loy-textarea {
+      width: 100%;
+      min-height: 200px;
+      resize: vertical;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: 14px;
+      line-height: 1.6;
+      box-sizing: border-box;
+      transition: 0.2s;
+    }
+
+    .loy-textarea:focus {
+      border-color: var(--loy-blue);
+      box-shadow: 0 0 0 3px rgba(106,167,255,0.35);
+      outline: none;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    #copyMsg {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--loy-blue);
+      display: none;
+      opacity: 0;
+      transition: opacity .4s;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="header"></div>
+<script>
+  loadHeader("編碼解碼工具", "Base64 編碼 / 解碼");
+</script>
+
+<main>
+  <h1>Base64 編碼 / 解碼</h1>
+  <p>將文字轉換成 Base64，或是將 Base64 反解成原始文字。</p>
+  <section class="loy-card" style="margin-top:16px;">
+    <div class="loy-card-title">輸入文字</div>
+    <textarea id="inputText" class="loy-textarea"
+      placeholder="請輸入要編碼或解碼的文字"></textarea>
+
+    <div class="btn-row">
+      <button id="btnEncode" class="tool-btn">Base64 編碼</button>
+      <button id="btnDecode" class="tool-btn secondary">Base64 解碼</button>
+    </div>
+  </section>
+  <section class="loy-card" style="margin-top:20px;">
+    <div class="loy-card-title">結果</div>
+    <textarea id="outputText" class="loy-textarea"
+      placeholder="結果會顯示在這裡" readonly></textarea>
+    <div class="btn-row" style="justify-content: flex-end;">
+      <button id="btnCopy" class="tool-btn secondary">複製結果</button>
+    </div>
+    <div id="copyMsg">✔ 已複製結果</div>
+  </section>
+</main>
+
+<script>
+  const inputEl  = document.getElementById("inputText");
+  const outputEl = document.getElementById("outputText");
+  const copyMsgEl = document.getElementById("copyMsg");
+  function encodeBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function decodeBase64(str) {
+    return decodeURIComponent(escape(atob(str)));
+  }
+  document.getElementById("btnEncode").onclick = () => {
+    const txt = inputEl.value;
+    if (!txt.trim()) {
+      outputEl.value = "（未輸入文字）";
+      return;
+    }
+    outputEl.value = encodeBase64(txt);
+  };
+  document.getElementById("btnDecode").onclick = () => {
+    const txt = inputEl.value.trim();
+    if (!txt) {
+      outputEl.value = "（未輸入 Base64 文本）";
+      return;
+    }
+    try {
+      outputEl.value = decodeBase64(txt);
+    } catch {
+      outputEl.value = "（Base64 格式錯誤，無法解碼）";
+    }
+  };
+  document.getElementById("btnCopy").onclick = async () => {
+    const v = outputEl.value.trim();
+    if (!v) return;
+    await navigator.clipboard.writeText(v);
+    copyMsgEl.style.display = "block";
+    copyMsgEl.style.opacity = "1";
+    setTimeout(() => {
+      copyMsgEl.style.opacity = "0";
+      setTimeout(() => { copyMsgEl.style.display = "none"; }, 400);
+    }, 1500);
+  };
+</script>
+
+<div id="global-buttons"></div>
+<script src="/js/global.js"></script>
+<script src="/js/loyui.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta name="description" content="Roy Toolbox 工具分類頁：查看所有此分類底下的工具列表。">
+
+<meta charset="UTF-8">
+
+<title id="pageTitle">分類工具｜Roy Toolbox</title>
+
+<!-- Google 字體（與首頁一致） -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- 全站樣式（含暗色模式） -->
+<link rel="stylesheet" href="/global.css">
+<link rel="stylesheet" href="/css/loyui.css">
+
+<style>
+body {
+  font-family: "Noto Sans TC", sans-serif;
+}
+
+/* 分類標題 */
+#catTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 20px 0 20px;
+}
+
+/* 工具卡片（跟首頁一樣） */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.tool-card {
+  background: var(--card-bg);
+  padding: 14px 12px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.tool-card img {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 10px;
+}
+.tool-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Main layout */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- Header -->
+<div id="header"></div>
+<script src="/js/loadHeader.js"></script>
+
+<main>
+  <div id="catTitle"></div>
+  <div id="catTools" class="tool-grid"></div>
+</main>
+
+<!-- 分類 JS（裡面有 tools 資料 & loadCategory） -->
+<script src="/js/category.js"></script>
+
+<script>
+  // 1. 讀取網址參數 ?cat=xxx
+  const params = new URLSearchParams(location.search);
+  const catId = params.get("cat") || "text";  // 預設 text
+
+  // 2. 定義 catId -> 顯示用名字
+  const catMap = {
+    text:      "文本工具",
+    language:  "語言工具",
+    count: "計算工具",
+    convert:   "換算工具",
+    codec:     "編碼解碼工具",
+    life:      "生活工具"
+  };
+
+  const catName = catMap[catId] || "分類工具";
+
+  // 3. 更新標題 / Header / 內容標題
+  document.title = `Roy Toolbox｜${catName}`;
+  loadHeader(catName);
+  document.getElementById("catTitle").textContent = catName;
+
+  // 4. 載入該分類底下所有工具
+  (async () => {
+  await loadCategory(catName);
+})();
+</script>
+
+<!-- 右下角按鈕 -->
+<div id="global-buttons"></div>
+<script src="/js/global.js"></script>
+
+</body>
+</html>

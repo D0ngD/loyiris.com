@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+
+<title>面積換算工具｜Roy Toolbox</title>
+<meta name="description" content="面積換算工具：支援公制、英制、美制、台灣面積單位（坪、甲、畝、分），即時換算、全表複製功能。免費免安裝，線上可用。">
+
+<link rel="stylesheet" href="/global.css">
+<link rel="stylesheet" href="/css/loyui.css">
+
+<script src="/js/loadHeader.js"></script>
+
+<style>
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+/* 兩欄布局 */
+.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media(max-width:900px) {
+  .two-cols { grid-template-columns: 1fr; }
+}
+
+.loy-label {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.loy-select, .loy-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+.result-table th {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--border);
+}
+.result-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+/* 統一下拉選單外觀（與進位制轉換一致） */
+.loy-select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.loy-select:focus {
+  outline: none;
+  border-color: var(--loy-blue);
+  box-shadow: 0 0 0 3px rgba(106, 167, 255, 0.35);
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div id="header"></div>
+<script>
+  loadHeader("換算工具", "面積換算工具");
+</script>
+
+<main>
+
+<h1>面積換算工具</h1>
+<p>支援公制、英制/美制面積單位的即時互相轉換。</p>
+<div class="two-cols">
+
+  <!-- 左側-->
+  <section class="loy-card">
+    <div class="loy-card-title">輸入面積</div>
+
+    <input id="inputValue" class="loy-input" placeholder="請輸入面積數值">
+
+    <label class="loy-label">原單位：</label>
+    <select id="unitFrom" class="loy-select"></select>
+  </section>
+
+  <!-- 右側-->
+  <section class="loy-card">
+    <div class="loy-card-title">指定轉換結果</div>
+
+    <input id="outputValue" class="loy-input" placeholder="轉換後會顯示在這裡" readonly>
+
+    <label class="loy-label">目標單位：</label>
+    <select id="unitTo" class="loy-select"></select>
+  </section>
+
+</div>
+
+<div style="margin-top:20px; text-align:center;">
+  <button class="tool-btn" id="btnConvert">開始轉換</button>
+</div>
+
+
+  <div id="errorMsg" style="
+    color:#e74c3c;
+    font-size:13px;
+    margin-top:10px;
+    display:none;
+  "></div>
+</div>
+
+<section class="loy-card" style="margin-top:26px;">
+  <div class="loy-card-title">完整換算表</div>
+
+  <div id="resultInfo" style="color:#777;">尚未產生結果。</div>
+
+  <table class="result-table" id="resultTable" style="display:none;">
+    <thead>
+      <tr><th>單位</th><th>結果</th></tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
+
+  <div class="loy-divider"></div>
+  <button id="btnCopy" class="tool-btn secondary">複製全部結果</button>
+  <div id="copyMsg" style="
+  margin-top:10px;
+  font-size:13px;
+  color:var(--loy-blue);
+  display:none;
+">
+  已複製全部結果
+</div>
+
+</section>
+
+
+<script>
+const areaUnits = {
+  // === 公制 ===
+  "km²": 1e6,
+  "ha": 10000,
+  "a": 100,
+  "m²": 1,
+  "dm²": 0.01,
+  "cm²": 0.0001,
+  "mm²": 1e-6,
+
+  // === 英制 / 美制 ===
+  "mi²": 2589988.110336,
+  "acre": 4046.8564224,
+  "yd²": 0.83612736,
+  "ft²": 0.09290304,
+  "in²": 0.00064516,
+
+  // === 台灣常用單位 ===
+  // 來源：地籍測量法規
+  "甲": 9699.17,        // 1 甲
+  "畝": 969.917,        // 1/10 甲
+  "分": 2939,           // 傳統計算方式
+  "厘": 293.9,          // 1/10 分
+  "坪": 3.305785        // 市制坪
+};
+
+const unitSelects = [document.getElementById("unitFrom"), document.getElementById("unitTo")];
+for (const sel of unitSelects) {
+  for (const u in areaUnits) {
+    const opt = document.createElement("option");
+    opt.value = u;
+    opt.textContent = u;
+    sel.appendChild(opt);
+  }
+}
+document.getElementById("unitFrom").value = "m²";
+document.getElementById("unitTo").value = "ft²";
+document.getElementById("btnConvert").onclick = () => {
+  const raw = document.getElementById("inputValue").value.trim();
+  const uf = document.getElementById("unitFrom").value;
+  const ut = document.getElementById("unitTo").value;
+
+  const errorMsg = document.getElementById("errorMsg");
+  errorMsg.style.display = "none";
+  errorMsg.textContent = "";
+
+  if (!raw) {
+    errorMsg.textContent = "請輸入數字！";
+    errorMsg.style.display = "block";
+    return;
+  }
+  const num = Number(raw);
+
+  if (isNaN(num)) {
+    errorMsg.textContent = "輸入並非有效數字！";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  const base = num * areaUnits[uf];
+  const result = base / areaUnits[ut];
+  document.getElementById("outputValue").value = result;
+  const tbody = document.getElementById("resultBody");
+  tbody.innerHTML = "";
+  document.getElementById("resultTable").style.display = "table";
+
+  for (const u in areaUnits) {
+    const tr = document.createElement("tr");
+    const value = base / areaUnits[u];
+    tr.innerHTML = `<td>${u}</td><td>${value}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById("resultInfo").textContent = "已產生結果";
+};
+
+  document.getElementById("btnCopy").onclick = async () => {
+    const rows = [...document.querySelectorAll("#resultBody tr")];
+    if (!rows.length) return;
+
+    let text = "";
+    rows.forEach(r => {
+      text += `${r.children[0].textContent}: ${r.children[1].textContent}\n`;
+    });
+    await navigator.clipboard.writeText(text);
+    const msg = document.getElementById("copyMsg");
+    msg.style.display = "block";
+    msg.style.opacity = "1";
+    setTimeout(() => {
+      msg.style.transition = "0.5s";
+      msg.style.opacity = "0";
+      setTimeout(() => msg.style.display = "none", 500);
+    }, 1500);
+  };
+
+</script>
+<section class="loy-card" style="margin-top:24px;">
+  <h2 style="font-size:16px; margin-bottom:8px;">關於這個工具</h2>
+  <p style="font-size:13px; color:#555; margin:0 0 6px;">
+    這裡放第一段工具說明…
+  </p>
+  <p style="font-size:13px; color:#555; margin:0 0 6px;">
+    這裡放第二段工具說明…
+  </p>
+  <p style="font-size:13px; color:#555; margin:0;">
+    這裡放第三段、使用情境或注意事項…
+  </p>
+</section>
+
+<div id="global-buttons"></div>
+<script src="/js/global.js"></script>
+<script src="/js/loyui.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+
+  <title>隨機喝什麼｜Roy Toolbox</title>
+  <meta name="description" content="隨機喝什麼：幫你抽出今日飲料卡，含動畫、預設飲料清單、避免重複抽中功能。免費免安裝，線上可用。">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      font-family: "Noto Sans TC", sans-serif;
+    }
+
+    /* 桌機：左右兩欄 */
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    /* 手機 → 上下排列 */
+    @media (max-width: 768px) {
+      .layout {
+        display: block !important;
+      }
+      .loy-card {
+        margin-bottom: 16px;
+        width: 100%;
+      }
+
+      .btn-row {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .btn-row button {
+        width: 100%;
+      }
+
+      .draw-card {
+        max-width: 100%;
+        min-height: 140px;
+        padding: 18px;
+      }
+    }
+
+    .loy-textarea {
+      width: 100%;
+      min-height: 240px;
+      resize: vertical;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: 14px;
+      line-height: 1.6;
+      box-sizing: border-box;
+      transition: 0.2s;
+    }
+    .loy-textarea:focus {
+      outline: none;
+      border-color: var(--loy-blue);
+      box-shadow: 0 0 0 3px rgba(106,167,255,0.35);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #777;
+      flex-wrap: wrap;
+    }
+
+    .count-text {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .draw-card-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .draw-card {
+      width: 100%;
+      max-width: 360px;
+      min-height: 150px;
+      border-radius: 16px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .draw-tag {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 11px;
+      padding: 4px 10px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 999px;
+      color: #555;
+    }
+
+    .draw-emoji {
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
+
+    .draw-main {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .draw-sub {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .draw-footer {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    .draw-card.animate {
+      animation: loyCardPop 0.6s ease-out;
+    }
+
+    @keyframes loyCardPop {
+      0%   { transform: scale(0.75) rotate(-4deg); opacity: 0; }
+      45%  { transform: scale(1.04) rotate(1deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    #errorMsg {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #e02424;
+      display: none;
+    }
+
+    #hintMsg {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--loy-blue);
+      display: none;
+      opacity: 0;
+      transition: opacity .4s;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="header"></div>
+  <script>
+    loadHeader("生活工具", "隨機喝什麼");
+  </script>
+
+  <main>
+    <h1>隨機喝什麼</h1>
+    <p>不知道喝什麼的時候，就讓小洛伊幫你抽出一張「今日飲料卡」吧！</p>
+
+    <div class="layout">
+
+      <!-- 左側：清單 -->
+      <section class="loy-card">
+        <div class="panel-header">
+          <div id="itemCount" class="count-text">目前 0 個選項</div>
+          <button id="btnClearList" class="tool-btn secondary">清空清單</button>
+        </div>
+
+        <textarea id="itemInput" class="loy-textarea"></textarea>
+
+        <label style="font-size:13px;">
+          <input type="checkbox" id="chkNoRepeat" checked>
+          避免連續抽到相同選項
+        </label>
+
+        <div id="errorMsg"></div>
+        <div id="hintMsg">預設飲料已載入</div>
+      </section>
+
+      <!-- 右側：抽卡 -->
+      <section class="loy-card">
+        <div class="panel-header">
+          <span>抽卡結果</span>
+          <span style="font-size:12px;color:#aaa;">按「開始抽」或按 Space</span>
+        </div>
+
+        <div class="draw-card-wrapper">
+          <div class="draw-card" id="drawCard">
+            <div class="draw-tag">今日飲料</div>
+            <div id="drawEmoji" class="draw-emoji">🥤</div>
+            <div id="drawMain" class="draw-main">尚未抽卡</div>
+            <div id="drawSub" class="draw-sub">準備好後按下開始抽吧！</div>
+          </div>
+
+          <!-- 修復後的按鈕區 -->
+          <div class="btn-row">
+            <button id="btnDraw" class="tool-btn">開始抽</button>
+            <button id="btnReDraw" class="tool-btn secondary" disabled>再抽一次</button>
+          </div>
+
+          <div id="drawFooter" class="draw-footer">小提示：飲料名稱與圖片無關喔！</div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    /* --------------------------
+       預設飲料清單
+    --------------------------- */
+    const defaultItems = [
+      "珍珠奶茶","紅茶","綠茶","青茶","烏龍茶",
+      "四季春","紅茶拿鐵","綠茶拿鐵","奶蓋紅茶","奶蓋綠茶",
+      "黑糖珍奶","抹茶牛奶","泰式奶茶","可可","阿華田",
+      "多多綠","多多紅","蘋果綠","葡萄柚綠","柳橙綠",
+      "冬瓜茶","冬瓜檸檬","蜂蜜檸檬","蜂蜜綠茶","水果茶",
+      "優酪乳","養樂多","冰沙","芒果冰沙","草莓冰沙",
+      "美式咖啡","拿鐵","卡布奇諾","焦糖瑪奇朵","手沖咖啡",
+      "可樂","雪碧","蘋果西打","氣泡水","乳酸飲料"
+    ];
+
+    /* 取得元素 */
+    const itemInput = document.getElementById("itemInput");
+    const itemCount = document.getElementById("itemCount");
+    const errorMsg = document.getElementById("errorMsg");
+    const hintMsg = document.getElementById("hintMsg");
+    const chkNoRepeat = document.getElementById("chkNoRepeat");
+
+    const btnClearList = document.getElementById("btnClearList");
+    const btnDraw = document.getElementById("btnDraw");
+    const btnReDraw = document.getElementById("btnReDraw");
+
+    const drawCard = document.getElementById("drawCard");
+    const drawEmoji = document.getElementById("drawEmoji");
+    const drawMain = document.getElementById("drawMain");
+    const drawSub = document.getElementById("drawSub");
+
+    let lastChoice = null;
+    let flashTimer = null;
+
+    /* --------------------------
+       初始化預設飲料
+    --------------------------- */
+    function loadDefault() {
+      itemInput.value = defaultItems.join("\n");
+      updateCount();
+      showHint("預設飲料已載入");
+    }
+
+    function getItems() {
+      return itemInput.value
+        .split(/\r?\n/)
+        .map(v => v.trim())
+        .filter(v => v.length > 0);
+    }
+
+    function updateCount() {
+      itemCount.textContent = `目前 ${getItems().length} 個選項`;
+    }
+
+    function showHint(msg) {
+      hintMsg.textContent = msg;
+      hintMsg.style.display = "block";
+      hintMsg.style.opacity = "1";
+
+      setTimeout(() => {
+        hintMsg.style.opacity = "0";
+        setTimeout(() => hintMsg.style.display = "none", 400);
+      }, 1200);
+    }
+
+    function showError(msg) {
+      if (!msg) {
+        errorMsg.style.display = "none";
+        return;
+      }
+      errorMsg.textContent = msg;
+      errorMsg.style.display = "block";
+    }
+
+    /* --------------------------
+       抽卡跑馬燈動畫
+    --------------------------- */
+    function startFlash(items, duration = 800) {
+      return new Promise(resolve => {
+        let idx = 0;
+
+        flashTimer = setInterval(() => {
+          drawMain.textContent = items[idx];
+          drawEmoji.textContent = "✨";
+          idx = (idx + 1) % items.length;
+        }, 70);
+
+        setTimeout(() => {
+          clearInterval(flashTimer);
+          resolve();
+        }, duration);
+      });
+    }
+
+    /* --------------------------
+       抽一個飲料
+    --------------------------- */
+    function pickOne() {
+      const items = getItems();
+      if (!items.length) return null;
+
+      let choice = items[Math.floor(Math.random() * items.length)];
+
+      if (chkNoRepeat.checked && items.length > 1) {
+        let safe = 0;
+        while (choice === lastChoice && safe < 8) {
+          choice = items[Math.floor(Math.random() * items.length)];
+          safe++;
+        }
+      }
+      lastChoice = choice;
+      return choice;
+    }
+
+    /* --------------------------
+       更新結果卡片
+    --------------------------- */
+    function updateResult(choice) {
+      if (!choice) return;
+
+      const emojis = ["🥤","🧋","🍹","🍸","☕","🫖","🧃","🥛"];
+      drawEmoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      drawMain.textContent = choice;
+      drawSub.textContent = "就決定是它了！";
+
+      drawCard.classList.remove("animate");
+      void drawCard.offsetWidth;
+      drawCard.classList.add("animate");
+
+      btnReDraw.disabled = false;
+    }
+
+    /* --------------------------
+       按鈕事件
+    --------------------------- */
+    btnClearList.onclick = () => {
+      itemInput.value = "";
+      updateCount();
+      showError("");
+      btnReDraw.disabled = true;
+      drawMain.textContent = "尚未抽卡";
+      drawSub.textContent = "請輸入清單後再抽取～";
+      drawEmoji.textContent = "🥤";
+    };
+
+    btnDraw.onclick = async () => {
+      const items = getItems();
+      showError("");
+
+      if (items.length === 0) {
+        showError("清單是空的，請先輸入或載入預設飲料。");
+        return;
+      }
+
+      await startFlash(items, 900);
+      updateResult(pickOne());
+    };
+
+    btnReDraw.onclick = async () => {
+      const items = getItems();
+      if (items.length === 0) return;
+
+      await startFlash(items, 900);
+      updateResult(pickOne());
+    };
+
+    /* Space 快速抽卡 */
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        btnDraw.click();
+      }
+    });
+
+    itemInput.addEventListener("input", () => {
+      updateCount();
+      showError("");
+    });
+
+    loadDefault();
+  </script>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+</body>
+</html>

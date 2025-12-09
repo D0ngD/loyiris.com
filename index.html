@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>RoyIris 小工具宇宙｜loyiris.com</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="RoyIris 小工具宇宙：提供文字處理、換算、編碼、生活抽籤等實用小工具。" />
+
+  <!-- 字體與共用樣式 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/global.css" />
+  <link rel="stylesheet" href="/css/loyui.css" />
+
+  <style>
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 80px;
+    }
+
+    /* ====== 頂部導航 ====== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      backdrop-filter: blur(10px);
+      background: color-mix(in srgb, var(--bg) 85%, rgba(255,255,255,0.8));
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--loy-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-text-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .brand-text-sub {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 999px;
+      transition: 0.2s;
+    }
+    .nav-links a:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 720px) {
+      .site-header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .nav-links {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+    }
+
+    /* ====== Hero 區塊 ====== */
+    .hero {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero-title span#hero-typing {
+      display: inline-block;
+      background: var(--loy-gradient);
+      -webkit-background-clip: text;
+      color: transparent;
+      min-height: 1.2em;
+      border-right: 2px solid rgba(0,0,0,0.35);
+      padding-right: 4px;
+      animation: caretBlink 1s step-end infinite;
+    }
+
+    @keyframes caretBlink {
+      0%,100% { border-color: transparent; }
+      50%     { border-color: rgba(0,0,0,0.5); }
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 16px;
+      max-width: 420px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .hero-buttons .tool-btn {
+      font-size: 14px;
+      padding: 9px 16px;
+      border-radius: 999px;
+    }
+
+    .hero-note {
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* 右側視覺區塊 */
+    .hero-visual {
+      position: relative;
+      height: 260px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top left, #f5e1cf 0, #d9c7b8 30%, #f4f0ea 100%);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-visual-inner-text {
+      text-align: center;
+      color: #5c4a3a;
+      z-index: 2;
+    }
+    .hero-visual-inner-text h2 {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .hero-visual-inner-text p {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    /* 奶茶柔光粒子 */
+    .bubble {
+      position: absolute;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,255,255,0.95) 0, rgba(255,255,255,0.1) 60%, transparent 70%);
+      opacity: 0.7;
+      filter: blur(0.3px);
+      animation: floatBubble 18s infinite ease-in-out;
+    }
+
+    @keyframes floatBubble {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      50% {
+        transform: translateY(-40px) scale(1.08);
+      }
+      90% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-80px) scale(0.98);
+        opacity: 0;
+      }
+    }
+
+    /* 讓每顆泡泡有不同速度與位置（用 nth-child） */
+    .hero-visual .bubble:nth-child(1)  { width: 90px; height: 90px; left: 8%;  top: 60%;  animation-duration: 22s; }
+    .hero-visual .bubble:nth-child(2)  { width: 50px; height: 50px; left: 70%; top: 65%;  animation-duration: 16s; animation-delay: -4s;}
+    .hero-visual .bubble:nth-child(3)  { width: 120px;height:120px; left: 60%; top: 10%;  animation-duration: 26s; animation-delay: -10s;}
+    .hero-visual .bubble:nth-child(4)  { width: 40px; height: 40px; left: 20%; top: 12%;  animation-duration: 14s; animation-delay: -6s;}
+    .hero-visual .bubble:nth-child(5)  { width: 70px; height: 70px; left: 35%; top: 70%;  animation-duration: 19s; animation-delay: -2s;}
+    .hero-visual .bubble:nth-child(6)  { width: 40px; height: 40px; left: 82%; top: 30%;  animation-duration: 17s; animation-delay: -8s;}
+    .hero-visual .bubble:nth-child(7)  { width: 100px;height:100px; left: 5%;  top: 20%;  animation-duration: 24s; animation-delay: -12s;}
+    .hero-visual .bubble:nth-child(8)  { width: 60px; height: 60px; left: 45%; top: 5%;   animation-duration: 20s; animation-delay: -3s;}
+
+    /* ====== 跳轉選單區 ====== */
+    .jump-section {
+      margin-top: 48px;
+    }
+    .jump-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .jump-section-sub {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 16px;
+    }
+
+    .jump-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .jump-card {
+      border-radius: 16px;
+      padding: 16px 16px 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: 0.2s;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .jump-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+    .jump-card-tag {
+      font-size: 11px;
+      color: #a47a4b;
+    }
+    .jump-card-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .jump-card-desc {
+      font-size: 13px;
+      color: #666;
+      flex: 1;
+    }
+    .jump-card-foot {
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* ====== 工具展示區 ====== */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 40px;
+      margin-bottom: 8px;
+    }
+    .section-sub {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 16px;
+    }
+
+    .tool-showcase {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .tool-card-large {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      align-items: center;
+      text-decoration: none;
+      color: var(--text);
+      transition: 0.2s;
+    }
+
+    .tool-card-large:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    .tool-card-visual {
+      height: 120px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top left, #fdf5ec 0, #f0e2cf 40%, #f8f4ee 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .tool-card-body-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .tool-card-body-cat {
+      font-size: 12px;
+      color: #aa8a6a;
+      margin-bottom: 6px;
+    }
+    .tool-card-body-desc {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .tool-card-body-meta {
+      font-size: 12px;
+      color: #999;
+    }
+
+    @media (max-width: 800px) {
+      .tool-card-large {
+        grid-template-columns: 1fr;
+      }
+      .tool-card-visual {
+        height: 90px;
+      }
+    }
+
+    /* ====== Footer ====== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 16px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      margin-top: 36px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 頂部 -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">
+        <div class="brand-logo">R</div>
+        <div class="brand-text">
+          <div class="brand-text-title">RoyIris Studio</div>
+          <div class="brand-text-sub">RoyTool & RoyAssistant</div>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="https://loyiris.com/">首頁</a>
+        <a href="https://loyiris.com/tools">電腦版工具</a>
+        <a href="https://tools.loyiris.com/">手機版工具</a>
+        <a href="https://loyiris.com/docs">文件參考</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero 區 -->
+    <section class="hero">
+      <!-- 左側文案 -->
+      <div>
+        <div class="hero-tag">
+          <span>✨</span>
+          <span>RoyTool & RoyAssistant</span>
+        </div>
+
+        <h1 class="hero-title">
+          <span id="hero-typing"></span>
+        </h1>
+
+        <p class="hero-sub">
+          從文字處理、單位換算到「今天吃什麼、喝什麼」，
+          未來會變成你的全能助理小洛伊。
+        </p>
+
+        <div class="hero-buttons">
+          <!-- TODO: 這邊 href 請換成你現在 RoyTool 手機版實際網域 -->
+          <a href="https://tools.loyiris.com/" class="tool-btn">手機版 RoyTool</a>
+          <a href="/tools/index.html" class="tool-btn secondary">電腦版 RoyTool</a>
+        </div>
+
+        <div class="hero-note">
+          目前手機版僅有網頁瀏覽，未來會選擇其中熱門工具開發成方便攜帶的APP。
+        </div>
+      </div>
+
+      <!-- 右側奶茶柔光粒子區 -->
+      <div class="hero-visual">
+        <!-- 奶茶宇宙小光點 -->
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+
+        <div class="hero-visual-inner-text">
+          <h2>RoyIris</h2>
+          <p>致力於讓生活更加便利。<br>RoyAssistant正在開發中，將於未來推出。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 跳轉選單區 -->
+    <section class="jump-section">
+      <h2 class="jump-section-title">要去哪一邊逛逛？</h2>
+      <p class="jump-section-sub">緩慢增加新工具中，歡迎將這個網頁入書籤列/我的最愛</p>
+      <div class="jump-grid">
+        <!-- 手機版 RoyTool -->
+        <a id="mobile-tools" class="jump-card" href="https://tools-royiris.com/">
+          <div class="jump-card-tag">手機優化版</div>
+          <div class="jump-card-title">前往 手機版工具頁面</div>
+          <div class="jump-card-desc">
+            針對手機螢幕設計的工具介面，適合日常快速使用與隨身查詢。
+			未來可能會開發成APP。
+          </div>
+          <div class="jump-card-foot">前往 tools-royiris.com</div>
+        </a>
+
+        <!-- 電腦版 loyiris Tools -->
+        <a id="desktop-tools" class="jump-card" href="/tools/index.html">
+          <div class="jump-card-tag">電腦版</div>
+          <div class="jump-card-title">前往 電腦版工具頁面</div>
+          <div class="jump-card-desc">
+            在桌機上使用時更加舒適，支援鍵盤操作、寬版文字區與更完整的內容說明，方便工作與寫報告時使用。
+          </div>
+          <div class="jump-card-foot">查看所有電腦版工具</div>
+        </a>
+
+        <!-- 文件參考 -->
+        <a class="jump-card" href="/docs/index.html">
+          <div class="jump-card-tag">參考資料</div>
+          <div class="jump-card-title">工具原理 & Wiki 連結整理</div>
+          <div class="jump-card-desc">
+            想知道 Base64、SHA-1、BMI、進位制與各種單位背後的定義與計算方式？這裡整理好官方／維基百科連結。
+          </div>
+          <div class="jump-card-foot">前往文件參考頁面</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 工具展示：依分類（示範主要幾個） -->
+    <!-- 文本工具 -->
+    <section>
+      <h2 class="section-title">文本工具</h2>
+      <p class="section-sub">處理文字、整理字串、快速度過那些重複又煩的手動操作。</p>
+
+      <div class="tool-showcase">
+        <a class="tool-card-large" href="/tools/special-symbols.html">
+          <div class="tool-card-visual">✦</div>
+          <div>
+            <div class="tool-card-body-title">特殊符號大全</div>
+            <div class="tool-card-body-cat">文本工具</div>
+            <div class="tool-card-body-desc">
+              把常用的星號、箭頭、括號、花體符號通通放在一起，一鍵點擊即複製，
+              不用再到處 Google 找那些看起來「好像差不多」的特殊符號。
+            </div>
+            <div class="tool-card-body-meta">適合：排版、貼文設計、標題裝飾。</div>
+          </div>
+        </a>
+
+        <a class="tool-card-large" href="/tools/text-flip-sort.html">
+          <div class="tool-card-visual">↕</div>
+          <div>
+            <div class="tool-card-body-title">文本翻轉排序</div>
+            <div class="tool-card-body-cat">文本工具</div>
+            <div class="tool-card-body-desc">
+              將多行文字依照 A → Z / Z → A 排序、翻轉行順序，或是逐字反轉。
+              適合整理清單、去重、比對資料前的前處理。
+            </div>
+            <div class="tool-card-body-meta">支援最大 10,000 行 / 50,000 字。</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 語言工具 -->
+    <section>
+      <h2 class="section-title">語言工具</h2>
+      <p class="section-sub">需要一句話暖暖心、當貼文靈感或是標題點綴時可以來抽一籤。</p>
+
+      <div class="tool-showcase">
+        <a class="tool-card-large" href="/tools/random-sentence.html">
+          <div class="tool-card-visual">💬</div>
+          <div>
+            <div class="tool-card-body-title">隨機句產生器</div>
+            <div class="tool-card-body-cat">語言工具</div>
+            <div class="tool-card-body-desc">
+              從愛情、文學、動畫、哲學等不同主題抽出一句話，並自動翻譯成繁體中文，
+              讓你隨時有一句可以引用的句子。
+            </div>
+            <div class="tool-card-body-meta">資料來源：一言 / Hitokoto API。</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 換算工具 -->
+    <section>
+      <h2 class="section-title">換算工具</h2>
+      <p class="section-sub">處理進位制與面積等常見換算，適合工程、程式以及買房做功課的你。</p>
+
+      <div class="tool-showcase">
+        <a class="tool-card-large" href="/tools/base-convert.html">
+          <div class="tool-card-visual">2↔16</div>
+          <div>
+            <div class="tool-card-body-title">進位制轉換工具</div>
+            <div class="tool-card-body-cat">換算工具</div>
+            <div class="tool-card-body-desc">
+              支援 2～36 進位互轉，輸入原進制數字後即可一鍵看到所有進位表示，
+              適合寫程式、讀 log 或在腦中想不出 0xFF 到底是多少時使用。
+            </div>
+            <div class="tool-card-body-meta">支援負數與多種進位顯示。</div>
+          </div>
+        </a>
+
+        <a class="tool-card-large" href="/tools/area-convert.html">
+          <div class="tool-card-visual">㎡</div>
+          <div>
+            <div class="tool-card-body-title">面積換算工具</div>
+            <div class="tool-card-body-cat">換算工具</div>
+            <div class="tool-card-body-desc">
+              支援公制、英制與台灣常用的「坪、甲」等單位互相換算，
+              對比房屋坪數、土地面積時，可以更直覺的理解實際大小。
+            </div>
+            <div class="tool-card-body-meta">含：㎡、坪、acre、mi²、甲… 等多單位。</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 編碼解碼工具 -->
+    <section>
+      <h2 class="section-title">編碼 / 雜湊工具</h2>
+      <p class="section-sub">處理 Base64 與 SHA1 等常見編碼／雜湊運算，方便測試與教學使用。</p>
+
+      <div class="tool-showcase">
+        <a class="tool-card-large" href="/tools/base64.html">
+          <div class="tool-card-visual">64</div>
+          <div>
+            <div class="tool-card-body-title">Base64 編碼 / 解碼</div>
+            <div class="tool-card-body-cat">編碼解碼工具</div>
+            <div class="tool-card-body-desc">
+              將文字轉成 Base64，或把 Base64 解回原始文字，
+              適合做 API 測試、處理簡單 token 或教學示範使用。
+            </div>
+            <div class="tool-card-body-meta">支援 UTF-8，包含中文也能正常編碼解碼。</div>
+          </div>
+        </a>
+
+        <a class="tool-card-large" href="/tools/sha1.html">
+          <div class="tool-card-visual">#</div>
+          <div>
+            <div class="tool-card-body-title">SHA1 雜湊產生器</div>
+            <div class="tool-card-body-cat">編碼解碼工具</div>
+            <div class="tool-card-body-desc">
+              對輸入文字計算 SHA-1 雜湊，可選擇加入前置或後置 Salt，
+              適合教學或簡單驗證，但不建議做為現代密碼儲存用途。
+            </div>
+            <div class="tool-card-body-meta">輸出 40 位十六進位字串，使用瀏覽器 Web Crypto API 計算。</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 生活工具 -->
+    <section>
+      <h2 class="section-title">生活工具</h2>
+      <p class="section-sub">不知道今天吃什麼、喝什麼的時候，就交給小洛伊抽卡決定。</p>
+
+      <div class="tool-showcase">
+        <a class="tool-card-large" href="/tools/eat-what.html">
+          <div class="tool-card-visual">🍽</div>
+          <div>
+            <div class="tool-card-body-title">隨機吃什麼</div>
+            <div class="tool-card-body-cat">生活工具</div>
+            <div class="tool-card-body-desc">
+              輸入菜單或使用內建台式／日韓／異國美食清單，按下抽卡就會幫你決定今天吃什麼，
+			  美食是人類一天的動力來源，你可以隨便吃就過一天，也可以把吃飯當成每天的享受。
+            </div>
+            <div class="tool-card-body-meta">支援 Space 快速抽卡，可避免連續抽到同一個選項。</div>
+          </div>
+        </a>
+
+        <a class="tool-card-large" href="/tools/drink-what.html">
+          <div class="tool-card-visual">🥤</div>
+          <div>
+            <div class="tool-card-body-title">隨機喝什麼</div>
+            <div class="tool-card-body-cat">生活工具</div>
+            <div class="tool-card-body-desc">
+              幫你從各種奶茶、茶飲、咖啡、汽水、氣泡飲中抽一杯，
+              不用再站在飲料店櫃台前糾結半天。也支援自訂清單。
+            </div>
+            <div class="tool-card-body-meta">支援 Space 快速抽卡，可避免連續抽到同一個選項。</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      © 2025 RoyIris Studio．有建議或是想要新增的工具可以來信至：auuse698@gmil.com
+    </footer>
+  </main>
+
+  <script>
+    // ===== 打字特效 =====
+    const typingTexts = [
+      "免費好用的小工具平台",
+      "你的生活助手",
+      "你的創作搭檔",
+      "簡單、快速、好用的小工具平台"
+    ];
+
+    const typingEl = document.getElementById("hero-typing");
+    let tIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+
+    function typeLoop() {
+      const text = typingTexts[tIndex];
+
+      if (!deleting) {
+        charIndex++;
+        typingEl.textContent = text.slice(0, charIndex);
+        if (charIndex === text.length) {
+          setTimeout(() => { deleting = true; }, 1400);
+        }
+      } else {
+        charIndex--;
+        typingEl.textContent = text.slice(0, charIndex);
+        if (charIndex === 0) {
+          deleting = false;
+          tIndex = (tIndex + 1) % typingTexts.length;
+        }
+      }
+      const delay = deleting ? 55 : 100;
+      setTimeout(typeLoop, delay);
+    }
+
+    typeLoop();
+  </script>
+</body>
+</html>

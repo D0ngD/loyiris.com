@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+
+<title>進位制轉換工具｜Roy Toolbox</title>
+<meta name="description" content="進位制轉換工具：支援 2～36 進位轉換，可輸入任意進位數字並產生完整換算表格，贈羅馬數字轉換。免費免安裝，線上可用。">
+
+
+<link rel="stylesheet" href="/global.css">
+<link rel="stylesheet" href="/css/loyui.css">
+
+<script src="/js/loadHeader.js"></script>
+
+<style>
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media(max-width:900px) {
+  .two-cols { grid-template-columns: 1fr; }
+}
+
+.loy-label {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+.result-table th {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--border);
+}
+.result-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.loy-select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  font-size: 15px;
+}
+.two-cols input,
+.two-cols select {
+  width: 100%;
+  box-sizing: border-box;  /* ★ 關鍵：包含 padding 與 border */
+  max-width: 100%;         /* ★ 安全限制：不會超過框 */
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="header"></div>
+<script>
+  loadHeader("換算工具", "進位制轉換");
+</script>
+
+<main>
+
+<h1>進位制轉換</h1>
+<p>支援 2～36 進位的數字轉換，並提供原進制 → 指定進制的即時轉換。</p>
+<div class="two-cols">
+  <section class="loy-card">
+    <div class="loy-card-title">輸入數字</div>
+
+
+    <input id="inputValue" class="loy-input" placeholder="請輸入要轉換的數字">
+
+    <label class="loy-label">原進制：</label>
+    <select id="baseFrom" class="loy-select"></select>
+  </section>
+  <section class="loy-card">
+    <div class="loy-card-title">指定轉換結果</div>
+
+
+    <input id="outputValue" class="loy-input" placeholder="轉換後會顯示在這裡" readonly>
+
+    <label class="loy-label">目標進制：</label>
+    <select id="baseTo" class="loy-select"></select>
+  </section>
+
+</div>
+
+<div style="margin-top:20px; text-align:center;">
+
+  <button class="tool-btn" id="btnConvert">開始轉換</button>
+</div>
+
+<section class="loy-card" style="margin-top:26px;">
+  <div class="loy-card-title">轉換結果</div>
+
+  <div id="resultInfo" style="color:#777;">尚未產生結果。</div>
+
+<div id="errorMsg" style="
+  color: #e74c3c;
+  margin-top: 6px;
+  font-size: 13px;
+  display: none;
+"></div>
+
+  <table class="result-table" id="resultTable" style="display:none;">
+    <thead>
+      <tr><th>系統</th><th>結果</th></tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
+
+  <div class="loy-divider"></div>
+  <button id="btnCopy" class="tool-btn secondary">複製全部結果</button>
+  <div id="copyMsg" style="
+  margin-top:10px;
+  font-size:13px;
+  color:var(--loy-blue);
+  display:none;
+">
+ 已複製全部結果
+</div>
+
+</section>
+
+
+<script>
+function initBaseSelect(sel, def=10){
+  for(let i=2;i<=36;i++){
+    const opt=document.createElement("option");
+    opt.value=i;
+    opt.textContent=`${i} 進制`;
+    if(i===def) opt.selected=true;
+    sel.appendChild(opt);
+  }
+}
+initBaseSelect(document.getElementById("baseFrom"), 10);
+initBaseSelect(document.getElementById("baseTo"), 2);
+
+function toRoman(num){
+  if(num<=0||num>=4000) return "（超出範圍）";
+  const map=[
+    ["M",1000],["CM",900],["D",500],["CD",400],
+    ["C",100],["XC",90],["L",50],["XL",40],
+    ["X",10],["IX",9],["V",5],["IV",4],["I",1]
+  ];
+  let res="";
+  for(const [sym,val] of map){
+    while(num>=val){ res+=sym; num-=val; }
+  }
+  return res;
+}
+
+document.getElementById("btnConvert").onclick = () => {
+  const raw = document.getElementById("inputValue").value.trim();
+  const baseFrom = parseInt(document.getElementById("baseFrom").value);
+  const baseTo = parseInt(document.getElementById("baseTo").value);
+
+document.getElementById("btnConvert").onclick = () => {
+  const raw = document.getElementById("inputValue").value.trim();
+  const baseFrom = parseInt(document.getElementById("baseFrom").value);
+  const baseTo = parseInt(document.getElementById("baseTo").value);
+  const errorMsg = document.getElementById("errorMsg");
+
+  errorMsg.style.display = "none";
+  errorMsg.textContent = "";
+
+  if (!raw) {
+    errorMsg.textContent = "請輸入數字！";
+    errorMsg.style.display = "block";
+    return;
+  }
+  let num;
+  try {
+    num = parseInt(raw, baseFrom);
+    if (isNaN(num)) throw Error();
+  } catch {
+    errorMsg.textContent = "輸入格式不符合原進制！";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  document.getElementById("outputValue").value = num.toString(baseTo);
+  const tbody = document.getElementById("resultBody");
+  tbody.innerHTML = "";
+  document.getElementById("resultTable").style.display = "table";
+
+  for (let b = 2; b <= 36; b++) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${b} 進制</td><td>${num.toString(b)}</td>`;
+    tbody.appendChild(tr);
+  }
+  document.getElementById("resultInfo").textContent = "已產生結果";
+};
+
+  document.getElementById("outputValue").value = num.toString(baseTo);
+  const tbody = document.getElementById("resultBody");
+  tbody.innerHTML="";
+  document.getElementById("resultTable").style.display="table";
+
+  for(let b=2;b<=36;b++){
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${b} 進制</td><td>${num.toString(b)}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById("resultInfo").textContent="已產生結果";
+};
+  document.getElementById("btnCopy").onclick = async() => {
+    const rows=[...document.querySelectorAll("#resultBody tr")];
+    if(!rows.length) return;
+
+    let text="";
+    rows.forEach(r=>{
+      text+=`${r.children[0].textContent}: ${r.children[1].textContent}\n`;
+    });
+
+    await navigator.clipboard.writeText(text);
+    const msg = document.getElementById("copyMsg");
+    msg.style.display = "block";
+    msg.style.opacity = "1";
+
+    setTimeout(() => {
+      msg.style.transition = "0.5s";
+      msg.style.opacity = "0";
+     setTimeout(() => msg.style.display = "none", 500);
+    }, 1500);
+  };
+
+</script>
+
+<div id="global-buttons"></div>
+<script src="/js/global.js"></script>
+<script src="/js/loyui.js"></script>
+
+</body>
+</html>

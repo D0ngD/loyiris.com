@@ -1,0 +1,76 @@
+{
+  "tools": [
+    {
+      "title": "特殊符號大全",
+      "icon": "/img/text-symbols.png",
+      "url": "/tools/special-symbols.html",
+      "category": "文本工具",
+      "common": true
+    },
+    {
+      "title": "文本翻轉排序",
+      "icon": "/img/text-sort.png",
+      "url": "/tools/text-flip-sort.html",
+      "category": "文本工具",
+      "common": true
+    },
+    {
+      "title": "隨機句產生器",
+      "icon": "/img/lang-random-sentence.png",
+      "url": "/tools/random-sentence.html",
+      "category": "語言工具",
+      "common": true
+    },
+    {
+      "title": "BMI計算",
+      "icon": "/img/bmi.png",
+      "url": "/tools/bmi.html",
+      "category": "計算工具",
+      "common": true
+    },
+    {
+      "title": "進制轉換工具",
+      "icon": "/img/base-convert.png",
+      "url": "/tools/base-convert.html",
+      "category": "換算工具",
+      "common": false
+    },
+    {
+      "title": "面積換算工具",
+      "icon": "/img/convert-area.png",
+      "url": "/tools/area-convert.html",
+      "category": "換算工具",
+      "common": true
+    },
+    {
+      "title": "SHA1 雜湊產生器",
+      "icon": "/img/encode-sha1.png",
+      "url": "/tools/sha1.html",
+      "category": "編碼解碼工具",
+      "common": true
+    },
+    {
+      "title": "隨機吃什麼",
+      "icon": "/img/life-eat.png",
+      "url": "/tools/eat-what.html",
+      "category": "生活工具",
+      "common": true
+    },
+    {
+      "title": "隨機喝什麼",
+      "icon": "/img/life-drink.png",
+      "url": "/tools/drink-what.html",
+      "category": "生活工具",
+      "common": true
+    }
+  ],
+
+  "categories": [
+    { "key": "文本工具", "id": "text", "desc": "處理、整理各種文字內容" },
+    { "key": "語言工具", "id": "language", "desc": "語言句子相關工具" },
+    { "key": "計算工具", "id": "count", "desc": "計算各種數值" },
+    { "key": "換算工具", "id": "convert", "desc": "單位與進位制換算" },
+    { "key": "編碼解碼工具", "id": "codec", "desc": "編碼、雜湊、轉換" },
+    { "key": "生活工具", "id": "life", "desc": "日常生活小工具" }
+  ]
+}

@@ -1,0 +1,45 @@
+:root {
+  --bg: #f5f7fa;
+  --text: #333;
+  --header-bg: #ffffff;
+  --header-text: #333;
+  --card-bg: #ffffff;
+}
+body.dark {
+  --bg: #202124;
+  --text: #e5e5e5;
+  --header-bg: #2d2f31;
+  --header-text: #e5e5e5;
+  --card-bg: #2d2f31;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  transition: 0.2s ease;
+}
+#global-buttons {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.global-btn {
+  width: 48px;
+  height: 48px;
+  background: var(--card-bg);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 22px;
+  transition: 0.2s;
+}
+.global-btn:hover {
+  transform: scale(1.1);
+}

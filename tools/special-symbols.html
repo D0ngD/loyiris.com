@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+
+<title>特殊符號大全｜Roy Toolbox</title>
+<meta name="description" content="特殊符號大全：快速複製常用符號、表情符號、天氣符號、音符符號等，免費、手機可用、免安裝。">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    h2 {
+      margin-top: 28px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .symbol-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .symbol-box {
+      padding: 14px 0;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      text-align: center;
+      cursor: pointer;
+      font-size: 22px;
+      transition: 0.25s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      user-select: none;
+    }
+
+    .symbol-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    /* 點擊後提示框 */
+    #copyMsg {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: var(--loy-blue);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-size: 14px;
+      display: none;
+      opacity: 0;
+      transition: opacity .4s, transform .4s;
+      transform: translateY(10px);
+      z-index: 999;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="header"></div>
+  <script>
+    loadHeader("文本工具", "特殊符號大全");
+  </script>
+
+  <main>
+    <h1>特殊符號大全</h1>
+    <p>點擊任一符號即可複製。分門別類一目了然。</p>
+
+    <div id="symbolContainer"></div>
+  </main>
+  <div id="copyMsg">已複製</div>
+
+  <script>
+    const symbolCategories = [
+      {
+        name: "🔥 熱門符號",
+        symbols: [
+          "★","☆","✓","✔","✗","✘","→","←","↑","↓","↗","↘","↙","↖",
+          "❤","♡","💛","💙","💜",
+          "◆","◇","■","□","▲","△","▽","▼","●","○","◎"
+        ]
+      },
+      {
+        name: "📝 常用符號",
+        symbols: [
+          "※","〒","→","←","∴","∵","•","‧","§","¶",
+          "「","」","『","』","【","】","〈","〉","《","》",
+          "（","）","〔","〕","〖","〗",
+          "♠","♣","♥","♦"
+        ]
+      },
+      {
+        name: "🎵 音符符號",
+        symbols: [
+          "♩","♪","♫","♬","♭","♮","♯"
+        ]
+      },
+      {
+        name: "☁ 天氣符號",
+        symbols: [
+          "☀","☁","☂","☃","⛄","⛅","⛈","❄","⚡","🌂"
+        ]
+      },
+      {
+        name: "🏢 商業符號",
+        symbols: [
+          "™","©","®","℠","℡","№","℅",
+          "%","‰","TEL","FAX","℞"
+        ]
+      },
+      {
+        name: "🚚 物體符號",
+        symbols: [
+          "✉","✎","✏","✐","✆","✍",
+          "🔨","🔧","⚙","🛠","🔩","🔗",
+          "📦","📌","📍","✂","🖊","🖋",
+          "🏠","🏢","🏗","🚚","🚛"
+        ]
+      },
+      {
+        name: "🔧 技術符號",
+        symbols: [
+          "⌘","⌥","⎋","⏻","⏼","⏽","⏾",
+          "⌨","🖱","🖥","💾","📁","📂","🗂"
+        ]
+      },
+      {
+        name: "🌈 單色表情符號",
+        symbols: [
+          "☺","☻","❀","❁","❃","✿","♡","❤","❣"
+        ]
+      }
+    ];
+    const container = document.getElementById("symbolContainer");
+
+    symbolCategories.forEach(cat => {
+      const h2 = document.createElement("h2");
+      h2.textContent = cat.name;
+      container.appendChild(h2);
+      const grid = document.createElement("div");
+      grid.className = "symbol-grid";
+
+      cat.symbols.forEach(s => {
+        const box = document.createElement("div");
+        box.className = "symbol-box";
+        box.textContent = s;
+
+        box.onclick = () => copySymbol(s, box);
+
+        grid.appendChild(box);
+      });
+
+      container.appendChild(grid);
+    });
+    const copyMsg = document.getElementById("copyMsg");
+
+    async function copySymbol(symbol, box) {
+      await navigator.clipboard.writeText(symbol);
+
+      box.style.background = "var(--loy-blue)";
+      box.style.color = "#fff";
+
+      setTimeout(() => {
+        box.style.background = "var(--card-bg)";
+        box.style.color = "var(--text)";
+      }, 300);
+
+      copyMsg.style.display = "block";
+      setTimeout(() => {
+        copyMsg.style.opacity = "1";
+        copyMsg.style.transform = "translateY(0)";
+      }, 10);
+
+      setTimeout(() => {
+        copyMsg.style.opacity = "0";
+        copyMsg.style.transform = "translateY(10px)";
+        setTimeout(()=>{ copyMsg.style.display="none"; }, 400);
+      }, 1200);
+    }
+
+  </script>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+</body>
+</html>

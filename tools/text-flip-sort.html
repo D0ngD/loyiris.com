@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+
+<title>文本翻轉排序｜Roy Toolbox</title>
+<meta name="description" content="文本翻轉排序工具：支援逐字翻轉、行排序、去重、字元排序，最大支援 10,000 行，快速整理文本。免費免安裝，線上使用">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+    @media (max-width: 900px) {
+      .tool-layout { grid-template-columns: 1fr; }
+    }
+
+    .loy-textarea {
+      width: 100%;
+      min-height: 220px;
+      resize: vertical;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: 14px;
+      line-height: 1.6;
+      font-family: "Noto Sans TC", sans-serif;
+      box-sizing: border-box;
+      transition: 0.2s;
+    }
+    .loy-textarea:focus {
+      outline: none;
+      border-color: var(--loy-blue);
+      box-shadow: 0 0 0 3px rgba(106,167,255,0.35);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .loy-btn.sm {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .tool-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #888;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* 複製提示樣式 */
+    #copyMsg {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--loy-blue);
+      display: none;
+      transition: opacity 0.5s;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+  <script>
+    loadHeader("文本工具", "文本翻轉排序");
+    document.title = "文本翻轉排序 | Roy Toolbox";
+  </script>
+
+  <main>
+    <h1>文本翻轉排序</h1>
+    <p>支援逐字翻轉、行排序、去重、多行處理，並自動偵測字數上限。</p>
+
+    <div class="tool-layout">
+
+      <!-- 左側 -->
+      <section class="loy-card">
+        <div class="loy-card-title">輸入文字</div>
+
+        <textarea id="inputText" class="loy-textarea"
+          placeholder="請貼上要處理的文本（最多 10,000 行 或 50,000 字）"></textarea>
+
+        <div class="tool-footer">
+          <span id="inputCount">0 行 / 0 字元</span>
+          <button id="btnClearInput" class="tool-btn">清空輸入</button>
+        </div>
+      </section>
+
+      <!-- 右側 -->
+      <section class="loy-card">
+        <div class="loy-card-title">操作</div>
+
+        <div class="btn-row">
+          <button class="tool-btn secondary" id="btnReverseChars">逐字翻轉</button>
+          <button class="tool-btn secondary" id="btnReverseLines">翻轉行順序</button>
+          <button class="tool-btn secondary" id="btnSortAZ">排序 A → Z（行）</button>
+          <button class="tool-btn secondary" id="btnSortZA">排序 Z → A（行）</button>
+
+          <button class="tool-btn secondary" id="btnSortCharsAZ">字元排序 A → Z（行內）</button>
+          <button class="tool-btn secondary" id="btnSortCharsZA">字元排序 Z → A（行內）</button>
+        </div>
+
+        <p style="font-size:12px; color:#777; margin-top:-6px;">
+          ※「行排序」會按照整行排序；「行內排序」會將每行的字元依字母順序排列。
+        </p>
+
+        <div class="tool-checkbox">
+          <input type="checkbox" id="chkIgnoreEmpty" checked>
+          <label for="chkIgnoreEmpty">忽略空白行（排序 / 去重時自動移除）</label>
+        </div>
+
+        <div class="loy-divider"></div>
+
+        <div class="result-info" id="resultInfo">尚未產生結果。</div>
+
+        <textarea id="outputText" class="loy-textarea"
+          placeholder="結果會顯示在這裡"></textarea>
+
+        <div class="tool-footer">
+          <span id="outputCount">0 行 / 0 字元</span>
+
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+            <button id="btnCopy" class="tool-btn">複製</button>
+            <button id="btnSwap" class="tool-btn">結果覆寫至輸入</button>
+          </div>
+        </div>
+        <div id="copyMsg">✔ 已複製結果</div>
+
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const MAX_LINES = 10000;
+    const MAX_CHARS = 50000;
+
+    const inputEl = document.getElementById("inputText");
+    const outputEl = document.getElementById("outputText");
+    const inputCountEl = document.getElementById("inputCount");
+    const outputCountEl = document.getElementById("outputCount");
+    const resultInfoEl = document.getElementById("resultInfo");
+    const ignoreEmptyEl = document.getElementById("chkIgnoreEmpty");
+
+    const btns = [
+      "btnReverseChars",
+      "btnReverseLines",
+      "btnSortAZ",
+      "btnSortZA"
+    ].map(id => document.getElementById(id));
+
+    function getLines(text) {
+      let lines = text.split(/\r?\n/);
+      if (ignoreEmptyEl.checked)
+        lines = lines.filter(l => l.trim() !== "");
+      return lines;
+    }
+
+    function updateInputCount() {
+      const txt = inputEl.value;
+      const lines = txt ? txt.split(/\r?\n/).length : 0;
+      const chars = txt.length;
+
+      inputCountEl.textContent = `${lines} 行 / ${chars} 字元`;
+
+      if (lines > MAX_LINES || chars > MAX_CHARS) {
+        inputCountEl.style.color = "red";
+        lockButtons(true);
+        resultInfoEl.textContent = "文本超過 10,000 行 或 50,000 字，請縮短後再試。";
+        outputEl.value = "";
+        updateOutputCount();
+      } else {
+        inputCountEl.style.color = "";
+        lockButtons(false);
+      }
+    }
+
+    function updateOutputCount() {
+      const t = outputEl.value;
+      const lines = t ? t.split(/\r?\n/).length : 0;
+      const chars = t.length;
+      outputCountEl.textContent = `${lines} 行 / ${chars} 字元`;
+    }
+
+    function lockButtons(lock) {
+      btns.forEach(btn => {
+        btn.disabled = lock;
+        btn.style.opacity = lock ? 0.5 : 1;
+        btn.style.pointerEvents = lock ? "none" : "auto";
+      });
+    }
+    function setResult(text, message) {
+      outputEl.value = text;
+      resultInfoEl.textContent = message;
+      updateOutputCount();
+    }
+    document.getElementById("btnSortCharsAZ").onclick = () => {
+      const src = inputEl.value;
+      if (!src.trim()) return;
+
+      const lines = src.split(/\r?\n/).map(l =>
+        l.split("").sort((a,b)=>a.localeCompare(b)).join("")
+      );
+
+      setResult(lines.join("\n"), "已進行行內字元排序（A → Z）");
+    };
+    document.getElementById("btnSortCharsZA").onclick = () => {
+      const src = inputEl.value;
+      if (!src.trim()) return;
+
+      const lines = src.split(/\r?\n/).map(l =>
+        l.split("").sort((a,b)=>b.localeCompare(a)).join("")
+      );
+
+      setResult(lines.join("\n"), "已進行行內字元排序（Z → A）");
+    };
+    document.getElementById("btnReverseChars").onclick = () => {
+      setResult(inputEl.value.split("").reverse().join(""), "已逐字翻轉");
+    };
+    document.getElementById("btnReverseLines").onclick = () => {
+      const result = getLines(inputEl.value).reverse().join("\n");
+      setResult(result, "已翻轉行順序");
+    };
+    document.getElementById("btnSortAZ").onclick = () => {
+      const result = getLines(inputEl.value).sort((a,b)=>a.localeCompare(b)).join("\n");
+      setResult(result, "已排序（A → Z）");
+    };
+    document.getElementById("btnSortZA").onclick = () => {
+      const result = getLines(inputEl.value).sort((a,b)=>b.localeCompare(a)).join("\n");
+      setResult(result, "已排序（Z → A）");
+    };
+    document.getElementById("btnClearInput").onclick = () => {
+      inputEl.value = "";
+      updateInputCount();
+    };
+    document.getElementById("btnSwap").onclick = () => {
+      inputEl.value = outputEl.value;
+      updateInputCount();
+      resultInfoEl.textContent = "已覆寫至輸入欄位";
+    };
+    document.getElementById("btnCopy").onclick = async () => {
+      if (!outputEl.value.trim()) return;
+      await navigator.clipboard.writeText(outputEl.value);
+
+      const msg = document.getElementById("copyMsg");
+      msg.style.display = "block";
+      msg.style.opacity = "1";
+
+      setTimeout(() => {
+        msg.style.opacity = "0";
+        setTimeout(()=>{ msg.style.display = "none"; }, 500);
+      }, 1500);
+    };
+    inputEl.addEventListener("input", updateInputCount);
+    outputEl.addEventListener("input", updateOutputCount);
+
+    updateInputCount();
+    updateOutputCount();
+  </script>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+</body>
+</html>

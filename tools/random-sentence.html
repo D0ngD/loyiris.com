@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+
+<title>隨機句產生器｜Roy Toolbox</title>
+<meta name="description" content="隨機句產生器：依主題抽一句中文，並自動翻譯，支援愛情、文學、動畫、哲學主題。免費免安裝,線上可用。">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    .sentence-box {
+      padding: 20px;
+      font-size: 18px;
+      line-height: 1.7;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-height: 80px;
+      white-space: pre-wrap;
+    }
+
+    .from-text {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #777;
+      text-align: right;
+    }
+
+    /* 主題按鈕列 */
+    .theme-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .theme-buttons .theme-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #e5e7eb;
+      color: #333;
+      border: none;
+      transition: 0.2s;
+    }
+
+    .theme-buttons .theme-btn:hover {
+      background: #d4d6da;
+    }
+
+    .theme-btn.active {
+      background: #4a90e2;
+      color: white;
+    }
+
+    h2 {
+      margin-top: 26px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="header"></div>
+<script>
+  loadHeader("語言工具", "隨機句產生器");
+</script>
+
+<main>
+
+  <h1>隨機句產生器</h1>
+  <section class="loy-card" style="margin-top:20px;">
+    <h2>中文一句話（含自動翻譯）</h2>
+
+    <label style="font-size:14px; font-weight:600;">主題：</label>
+    <div class="theme-buttons">
+      <button class="theme-btn active" data-type="love">愛情</button>
+      <button class="theme-btn" data-type="literature">文學</button>
+      <button class="theme-btn" data-type="anime">動畫</button>
+      <button class="theme-btn" data-type="philosophy">哲學</button>
+    </div>
+
+    <div id="cnBox" class="sentence-box" style="margin-top:14px;">
+      按「抽中文一句」取得句子。
+    </div>
+    <div id="cnFrom" class="from-text"></div>
+
+    <div style="text-align:center; margin-top:16px;">
+      <button id="btnCN" class="tool-btn">抽中文一句</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const cnBox = document.getElementById("cnBox");
+  const cnFrom = document.getElementById("cnFrom");
+  const btnCN = document.getElementById("btnCN");
+
+  const themeBtns = document.querySelectorAll(".theme-btn");
+  let currentTheme = "love";
+  const themeMap = {
+    love: "l",
+    literature: "d",
+    anime: "a",
+    philosophy: "d"
+  };
+  themeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      themeBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentTheme = btn.dataset.type;
+    });
+  });
+  async function fetchCN(c) {
+    try {
+      const res = await fetch(`https://v1.hitokoto.cn/?encode=json&c=${c}`);
+      const data = await res.json();
+      return { text: data.hitokoto, from: data.from || "" };
+    } catch {
+      return { text: "（取得句子失敗）", from: "" };
+    }
+  }
+  async function toZH(text) {
+    try {
+      const res = await fetch(
+        "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-TW&dt=t&q=" +
+          encodeURIComponent(text)
+      );
+      const data = await res.json();
+      return data[0][0][0];
+    } catch {
+      return "（翻譯失敗）";
+    }
+  }
+  btnCN.onclick = async () => {
+    btnCN.textContent = "取得中...";
+    btnCN.disabled = true;
+
+    const type = themeMap[currentTheme];
+    const cn = await fetchCN(type);
+    const zh = await toZH(cn.text);
+
+    cnBox.textContent = zh;
+    cnFrom.textContent = cn.from ? "— " + cn.from : "";
+
+    btnCN.textContent = "抽隨機一句";
+    btnCN.disabled = false;
+  };
+</script>
+<div id="global-buttons"></div>
+<script src="/js/global.js"></script>
+<script src="/js/loyui.js"></script>
+
+</body>
+</html>
