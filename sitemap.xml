@@ -3,17 +3,17 @@
 
   <!-- Home -->
   <url>
-    <loc>https://tools.loyiris.com/</loc>
+    <loc>https://loyiris.com/</loc>
   </url>
 
   <!-- Categories (分類首頁) -->
   <url>
-    <loc>https://tools.loyiris.com/categories/</loc>
+    <loc>https://loyiris.com/tools/</loc>
   </url>
 
   <!-- Category pages -->
   <url>
-    <loc>https://tools.loyiris.com/categories/category-template.html?cat=text</loc>
+    <loc>https://loyiris.com/categories/category-template.html?cat=text</loc>
   </url>
   <url>
     <loc>https://tools.loyiris.com/categories/category-template.html?cat=language</loc>
@@ -33,31 +33,31 @@
 
   <!-- 工具頁面 (from tools.json) -->
   <url>
-    <loc>https://tools.loyiris.com/tools/special-symbols.html</loc>
+    <loc>https://loyiris.com/tools/special-symbols</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/text-flip-sort.html</loc>
+    <loc>https://loyiris.com/tools/text-flip-sort</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/random-sentence.html</loc>
+    <loc>https://loyiris.com/tools/random-sentence</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/bmi.html</loc>
+    <loc>https://loyiris.com/tools/bmi</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/base-convert.html</loc>
+    <loc>https://loyiris.com/tools/base-convert</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/area-convert.html</loc>
+    <loc>https://loyiris.com/tools/area-convert</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/sha1.html</loc>
+    <loc>https://loyiris.com/tools/sha1</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/eat-what.html</loc>
+    <loc>https://loyiris.com/tools/eat-what</loc>
   </url>
   <url>
-    <loc>https://tools.loyiris.com/tools/drink-what.html</loc>
+    <loc>https://loyiris.com/tools/drink-what</loc>
   </url>
 
 </urlset>
