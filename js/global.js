@@ -4,7 +4,7 @@
   container.innerHTML = `
     <div class="global-btn" id="btn-top" title="回到最上方">△</div>
     <div class="global-btn" id="btn-theme" title="明亮 / 暗黑模式">○</div>
-    <div class="global-btn" id="btn-feedback" title="意見反饋">☆</div>
+    <div class="global-btn" id="btn-about" title="關於本站">☆</div>
   `;
 
   // 回到最上方
@@ -27,8 +27,8 @@
     else document.body.classList.remove("dark");
   }
 
-  // 意見反饋
-  document.getElementById("btn-feedback").onclick = () => {
-    location.href = "/feedback.html";
+  // 關於本站
+  document.getElementById("btn-about").onclick = () => {
+    location.href = "/about.html";
   };
 })();
