@@ -43,6 +43,13 @@
       "common": true
     },
     {
+      "title": "年份換算",
+      "icon": "/img/year.png",
+      "url": "/tools/year-convert.html",
+      "category": "換算工具",
+      "common": true
+    }
+    {
       "title": "SHA1 雜湊產生器",
       "icon": "/img/encode-sha1.png",
       "url": "/tools/sha1.html",
