@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+
+  <title>各國年份換算成西元年｜Roy Toolbox</title>
+  <meta name="description" content="快速將民國、日本年號、佛曆等年份換算成西元年。支援即時換算，免安裝線上工具。">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      font-family: "Noto Sans TC", sans-serif;
+    }
+
+    .tool-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      background: linear-gradient(90deg, #f7dcdc, #f5e9ff);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #444;
+      padding: 16px;
+      background: #faf7ff;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header"></header>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="/index.html">工具首頁</a> › 各國年份換算
+    </nav>
+
+    <h1 class="tool-title">各國年份換算成西元年</h1>
+
+    <div class="tool-card">
+      <label for="system">選擇年份系統</label>
+      <select id="system">
+        <option value="roc">民國（Minguo）</option>
+        <option value="jp_reiwa">日本 令和</option>
+        <option value="jp_heisei">日本 平成</option>
+        <option value="jp_showa">日本 昭和</option>
+        <option value="buddhist">佛曆（泰國）</option>
+        <option value="islamic">伊斯蘭曆（Hijri）</option>
+      </select>
+
+      <label for="year">輸入年份</label>
+      <input id="year" type="number" placeholder="例如：112、5、30…">
+
+      <button onclick="convertYear()">換算 ➜ 西元年</button>
+
+      <div class="result" id="result"></div>
+    </div>
+  </main>
+
+  <script>
+    function convertYear() {
+      const system = document.getElementById('system').value;
+      const y = parseInt(document.getElementById('year').value);
+      const resultBox = document.getElementById('result');
+
+      if (!y || y < 0) {
+        resultBox.style.display = 'block';
+        resultBox.textContent = "請輸入正確的年份。";
+        return;
+      }
+
+      let western = null;
+
+      switch (system) {
+        case "roc":        western = y + 1911; break;       // 民國
+        case "jp_reiwa":   western = y + 2018; break;       // 令和元年 = 2019
+        case "jp_heisei":  western = y + 1988; break;       // 平成元年 = 1989
+        case "jp_showa":   western = y + 1925; break;       // 昭和元年 = 1926
+        case "buddhist":   western = y - 543; break;        // 佛曆比西元多 543
+        case "islamic":    western = Math.round(y * 0.97 + 622); break;  
+      }
+
+      resultBox.style.display = 'block';
+      resultBox.textContent = `西元：${western} 年`;
+    }
+  </script>
+</body>
+</html>
