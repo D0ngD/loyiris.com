@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>計數器 | Roy Toolbox</title>
+  <meta name="description" content="免費線上計數器，可用於人數統計、比賽得分、次數紀錄，支援鍵盤與 +10 / −10 快速操作。">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    /* ===== Counter UI ===== */
+
+    .counter-card {
+      max-width: 520px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    .counter-display {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 24px 0 32px;
+    }
+
+    .digit-box {
+      width: 70px;
+      height: 90px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 48px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .counter-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .circle-btn {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      font-size: 42px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      transition: 0.2s;
+    }
+
+    .circle-btn.minus {
+      background: #f1e6d8;
+      color: #333;
+    }
+
+    .circle-btn.plus {
+      background: #9be59b;
+      color: #0b3d0b;
+    }
+
+    .circle-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .quick-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .digit-box {
+        width: 60px;
+        height: 80px;
+        font-size: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <script>
+    const categoryName = "計算工具";
+    const toolName = "計數器";
+    loadHeader(categoryName, toolName);
+  </script>
+
+  <main>
+    <h1 class="tool-title">計數器</h1>
+    <p class="tool-desc">
+      適合用於人數統計、比賽得分、點擊次數紀錄。支援鍵盤與快速加減。
+    </p>
+
+    <div class="loy-card counter-card">
+
+      <!-- 數字顯示 -->
+      <div id="counterDisplay" class="counter-display"></div>
+
+      <!-- + / - -->
+      <div class="counter-buttons">
+        <button class="circle-btn minus" onclick="changeCount(-1)">−</button>
+        <button class="circle-btn plus" onclick="changeCount(1)">+</button>
+      </div>
+
+      <!-- 快速鍵 -->
+      <div class="quick-actions">
+        <button class="tool-btn secondary" onclick="changeCount(-10)">−10</button>
+        <button class="tool-btn secondary" onclick="changeCount(10)">+10</button>
+        <button class="tool-btn" onclick="resetCount()">重設</button>
+      </div>
+
+      <div class="hint">
+        ⌨ 鍵盤操作：<br>
+        ＋ / Space → +1 ｜ − → −1<br>
+        Shift + ＋ → +10 ｜ Shift + − → −10
+      </div>
+    </div>
+  </main>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+
+  <script>
+    let count = 0;
+
+    function render() {
+      const str = count.toString().padStart(4, "0");
+      const box = document.getElementById("counterDisplay");
+      box.innerHTML = "";
+      [...str].forEach(d => {
+        const el = document.createElement("div");
+        el.className = "digit-box";
+        el.textContent = d;
+        box.appendChild(el);
+      });
+    }
+
+    function changeCount(n) {
+      count += n;
+      if (count < 0) count = 0;
+      render();
+    }
+
+    function resetCount() {
+      count = 0;
+      render();
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "+" || e.key === "=") {
+        changeCount(e.shiftKey ? 10 : 1);
+      }
+      if (e.key === "-" || e.key === "_") {
+        changeCount(e.shiftKey ? -10 : -1);
+      }
+      if (e.code === "Space") {
+        e.preventDefault();
+        changeCount(1);
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

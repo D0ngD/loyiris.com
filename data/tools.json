@@ -28,6 +28,13 @@
       "category": "計算工具",
       "common": true
     },
+	{
+      "title": "計數器",
+      "category": "計算工具",
+      "icon": "/img/counter.png",
+      "url": "/tools/counter.html",
+      "common": true
+    },
     {
       "title": "進制轉換工具",
       "icon": "/img/base-convert.png",

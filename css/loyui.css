@@ -22,21 +22,14 @@
   --header-bg: var(--card-bg);
   --header-text: var(--text);
 
-  --bg: #ede9e6;
+  /* 亮色模式（移到這裡作為預設） */
+  --bg: #ede9e6;  /* 淺奶茶藍灰背景 */
   --text: #222;
   --card-bg: #ffffff;
   --border: #d7d9e0;
 }
 
-
-  /* 亮色模式 */
-  --bg: #f4f6ff;
-  --text: #222;
-  --card-bg: #ffffff;
-  --border: #d7d9e0;
-}
-
-/* 暗色模式 */
+/* 暗色模式（override 亮色） */
 body.dark {
   --bg: #1c1e26;
   --text: #f1f1f7;
@@ -54,8 +47,9 @@ body {
   transition: background 0.25s, color 0.25s;
 }
 
-/* ========== Header ========== */
-.loy-header {
+/* ========== Header (合併 loy-header 和 topbar) ========== */
+.loy-header,
+.topbar {
   display: flex;
   align-items: center;
   padding: 14px 26px;
@@ -65,9 +59,13 @@ body {
   top: 0;
   z-index: 999;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  font-size: 20px;
+  font-weight: 700;
+  gap: 10px;
 }
 
-.loy-header-logo {
+.loy-header-logo,
+.topbar .logo {
   height: 42px;
   margin-right: 12px;
 }
@@ -80,10 +78,24 @@ body {
   color: transparent;
 }
 
+.crumb {
+  color: var(--header-text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.crumb:hover {
+  text-decoration: underline;
+}
+
+.crumb-current {
+  color: var(--header-text);
+  font-weight: 700;
+}
+
 /* ========== 按鈕 ========== */
-/* 覆蓋 LoyUI 彩色按鈕，改為純色 */
 .tool-btn {
-  background: #ccb08f;    /*咖主按鈕 */
+  background: #ccb08f;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -107,7 +119,6 @@ body {
 .tool-btn.secondary:hover {
   background: #d4d6da;
 }
-
 
 /* ========== 卡片 ========== */
 .loy-card {
@@ -147,4 +158,212 @@ body {
   margin: 18px 0;
   border-radius: 3px;
   background: var(--loy-gradient);
+}
+
+/* ========== 從 index.html 和 category-template.html <style> 移過來的 base 樣式 ========== */
+* {
+  box-sizing: border-box;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 16px 56px;
+}
+
+/* 搜尋列 */
+.search-box {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 8px;
+}
+.search-box input {
+  width: 100%;
+  max-width: 520px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+}
+
+/* 區塊通用 */
+.section {
+  margin-top: 24px;
+}
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.section-title small {
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+}
+
+/* 工具卡片列表（常用 / 搜尋結果） */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.tool-card {
+  background: var(--card-bg);
+  padding: 14px 12px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.tool-card img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+}
+.tool-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 分類區塊 */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.category-block {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.category-header {
+  margin-bottom: 10px;
+}
+.category-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+.category-desc {
+  font-size: 12px;
+  color: #777;
+  margin-top: 2px;
+}
+
+.category-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* 隱藏類別 */
+.hide {
+  display: none;
+}
+
+/* 搜尋無結果樣式（如果需要） */
+#searchEmpty {
+  text-align: center;
+  color: #888;
+  margin: 20px 0;
+}
+
+/* ============================================================
+   📱 TOOL & TOOL-PAGE RESPONSIVE DESIGN (Mobile < 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* ------- 工具首頁：改成一欄 ------- */
+  .tool-grid,
+  .categories-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* 工具卡片滿版 */
+  .tool-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* 分類內工具列表改成一欄 */
+  .category-tools {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 搜尋框拉滿寬度 */
+  .search-box input {
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  /* header 在手機調整 padding 以壓縮比例 */
+  .loy-header,
+  .topbar {
+    padding: 12px 16px !important;
+  }
+
+  /* 其他工具頁設定 */
+  .tool-layout,
+  .two-column,
+  .tool-content-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px;
+  }
+
+  .tool-left,
+  .tool-right,
+  .column-box {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  textarea,
+  .input-box,
+  .output-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 180px;
+  }
+
+  .tool-actions,
+  .button-group,
+  .action-row {
+    display: flex !important;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 6px;
+    padding-bottom: 10px;
+  }
+
+  .float-buttons,
+  .side-tools {
+    display: none !important;
+  }
+
+  .tool-page-container {
+    width: 100% !important;
+    padding: 0 16px !important;
+  }
+
+  main {
+    padding: 20px 16px !important;
+  }
 }
