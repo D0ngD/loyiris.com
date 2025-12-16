@@ -64,6 +64,13 @@
       "common": true
     },
     {
+      "title": "Base64 解碼器/編碼棄",
+      "icon": "/img/base64.png",
+      "url": "/tools/base64.html",
+      "category": "編碼解碼工具",
+      "common": true
+    },
+    {
       "title": "隨機吃什麼",
       "icon": "/img/life-eat.png",
       "url": "/tools/eat-what.html",
