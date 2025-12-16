@@ -64,7 +64,7 @@
       "common": true
     },
     {
-      "title": "Base64 解碼器/編碼棄",
+      "title": "Base64 解碼器/編碼器",
       "icon": "/img/base64.png",
       "url": "/tools/base64.html",
       "category": "編碼解碼工具",
