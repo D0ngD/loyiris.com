@@ -264,10 +264,22 @@ function spin() {
 
 function showResult() {
   const options = getOptions();
-  const angle = (2 * Math.PI) / options.length;
-  const index = Math.floor(((2 * Math.PI - rotation % (2 * Math.PI)) % (2 * Math.PI)) / angle);
-  document.getElementById("result").textContent = `結果：${options[index]}`;
+  const count = options.length;
+  const angle = (2 * Math.PI) / count;
+
+  // 修正：補上指針在 12 點鐘方向的偏移（-90 度）
+  const adjustedRotation =
+    (rotation + Math.PI / 2) % (2 * Math.PI);
+
+  const index =
+    Math.floor(
+      ((2 * Math.PI - adjustedRotation) % (2 * Math.PI)) / angle
+    ) % count;
+
+  document.getElementById("result").textContent =
+    `結果：${options[index]}`;
 }
+
 
 function resetWheel() {
   rotation = 0;
@@ -284,3 +296,4 @@ drawWheel();
 
 </body>
 </html>
+
