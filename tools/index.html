@@ -49,35 +49,216 @@
       >
     </div>
 
-    <!-- 常用工具 -->
-    <section id="common-section" class="section">
-      <div class="section-title">
-        <span>常用工具</span>
-        <small>熱門工具</small>
-      </div>
-      <div id="commonGrid" class="tool-grid"></div>
-    </section>
+<!DOCTYPE html>
 
-    <!-- 分類工具 -->
-    <section id="categories-section" class="section">
-      <div class="section-title">
-        <span>分類工具</span>
-        <small>依類型瀏覽所有工具</small>
-      </div>
-      <div id="categoriesContainer" class="categories-grid"></div>
-    </section>
+<html lang="zh-TW">
+<head>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280" crossorigin="anonymous"></script>
 
-    <!-- 搜尋結果 -->
-    <section id="search-section" class="section hide">
-      <div class="section-title">
-        <span>搜尋結果</span>
-        <small id="searchCount"></small>
-      </div>
-      <div id="searchGrid" class="tool-grid"></div>
-      <div id="searchEmpty" style="display:none; color:#777; font-size:13px;">
-        沒有符合的工具喔～
-      </div>
-    </section>
+  <title>Roy Toolbox｜免費、快速、無須安裝的線上工具集合</title>
+  <meta name="description" content="Roy Toolbox：匯集文本工具、換算工具、生活小工具、編碼工具等，每週新增新工具，快速、乾淨、手機可用、不需下載。">
+  <meta name="keywords" content="線上工具, 文本工具, 換算工具, BMI 計算, SHA1, 特殊符號, 隨機吃什麼, Roy Toolbox">
+
+  <meta property="og:title" content="Roy Toolbox｜免費、快速、無須安裝的線上工具集合">
+  <meta property="og:description" content="收錄多種實用線上工具，適合在桌機與筆電上使用，界面與 Roy Toolbox 手機版一致。">
+  <meta property="og:image" content="/img/og-default.png">
+  <meta property="og:url" content="https://loyiris.com/tools/">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Roy Toolbox｜線上工具集合">
+  <meta name="twitter:description" content="免費、快速、無須安裝的線上工具集合">
+  <meta name="twitter:image" content="https://loyiris.com/img/og-default.png">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="canonical" href="https://loyiris.com/tools/">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- 共用 Header -->
+
+  <div id="header"></div>
+  <script src="/js/loadHeader.js"></script>
+  <script>loadHeader("");</script>
+
+  <main>
+    <!-- 搜尋列 -->
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="搜尋工具…（例如：吃什麼、SHA1、換算）"
+        aria-label="搜尋工具"
+      >
+    </div>
+
+<!-- 常用工具 -->
+<section id="common-section" class="section">
+  <div class="section-title">
+    <span>常用工具</span>
+    <small>熱門工具</small>
+  </div>
+  <div id="commonGrid" class="tool-grid"></div>
+</section>
+
+<!-- 分類工具 -->
+<section id="categories-section" class="section">
+  <div class="section-title" style="align-items:center;">
+    <span>分類工具</span>
+    <small>依類型瀏覽所有工具</small>
+  </div>
+
+  <div id="categoriesContainer" class="categories-grid"></div>
+
+  <!-- 顯示所有工具按鈕 + 文件參考 -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:12px;">
+    <a href="/docs/" class="tool-btn secondary" style="text-decoration:none;">
+      工具文件參考
+    </a>
+    <button id="showAllBtn" class="tool-btn secondary">
+      顯示所有工具
+    </button>
+  </div>
+</section>
+
+<!-- 搜尋 / 全部工具結果 -->
+<section id="search-section" class="section hide">
+  <div class="section-title">
+    <span>工具列表</span>
+    <small id="searchCount"></small>
+  </div>
+  <div id="searchGrid" class="tool-grid"></div>
+  <div id="searchEmpty" style="display:none; color:#777; font-size:13px;">
+    沒有符合的工具喔～
+  </div>
+</section>
+  </main>
+
+  <!-- 工具資料與渲染邏輯 -->
+
+  <script src="/js/category.js"></script>
+
+  <script>
+    (async function () {
+      const tools = await getTools();
+      const categories = await getCategories();
+
+      const commonGrid = document.getElementById("commonGrid");
+      const categoriesContainer = document.getElementById("categoriesContainer");
+
+      const searchInput = document.getElementById("searchInput");
+      const searchSection = document.getElementById("search-section");
+      const commonSection = document.getElementById("common-section");
+      const categoriesSection = document.getElementById("categories-section");
+      const searchGrid = document.getElementById("searchGrid");
+      const searchEmpty = document.getElementById("searchEmpty");
+      const searchCount = document.getElementById("searchCount");
+      const showAllBtn = document.getElementById("showAllBtn");
+
+      function createToolCard(t) {
+        const div = document.createElement("div");
+        div.className = "tool-card";
+        div.onclick = () => location.href = t.url;
+        div.innerHTML = `
+          <img src="${t.icon}" alt="${t.title}">
+          <div class="tool-title">${t.title}</div>
+        `;
+        return div;
+      }
+
+      function renderCommon() {
+        commonGrid.innerHTML = "";
+        tools.filter(t => t.common).slice(0, 10).forEach(t => {
+          commonGrid.appendChild(createToolCard(t));
+        });
+      }
+
+      function renderCategories() {
+        categoriesContainer.innerHTML = "";
+        categories.forEach(cat => {
+          const catTools = tools.filter(t => t.category === cat.key);
+          if (catTools.length === 0) return;
+
+          const block = document.createElement("div");
+          block.className = "category-block";
+          block.innerHTML = `
+            <div class="category-header">
+              <div class="category-name">${cat.key}</div>
+              <div class="category-desc">${cat.desc}</div>
+            </div>
+          `;
+
+          const list = document.createElement("div");
+          list.className = "category-tools";
+          catTools.slice(0, 2).forEach(t => list.appendChild(createToolCard(t)));
+
+          const footer = document.createElement("div");
+          footer.className = "category-footer";
+          footer.innerHTML = `<a class="more-link" href="/categories/category-template.html?cat=${cat.id}">More →</a>`;
+
+          block.appendChild(list);
+          block.appendChild(footer);
+          categoriesContainer.appendChild(block);
+        });
+      }
+
+      function handleSearch() {
+        const key = searchInput.value.trim().toLowerCase();
+        if (key === "") {
+          searchSection.classList.add("hide");
+          commonSection.classList.remove("hide");
+          categoriesSection.classList.remove("hide");
+          return;
+        }
+
+        searchSection.classList.remove("hide");
+        commonSection.classList.add("hide");
+        categoriesSection.classList.add("hide");
+
+        const result = tools.filter(t =>
+          t.title.toLowerCase().includes(key) ||
+          t.category.toLowerCase().includes(key)
+        );
+
+        searchGrid.innerHTML = "";
+        result.forEach(t => searchGrid.appendChild(createToolCard(t)));
+        searchEmpty.style.display = result.length === 0 ? "block" : "none";
+        searchCount.textContent = result.length ? `共 ${result.length} 個工具符合「${key}」` : "";
+      }
+
+      function showAllTools() {
+        searchInput.value = "";
+        searchSection.classList.remove("hide");
+        commonSection.classList.add("hide");
+        categoriesSection.classList.add("hide");
+
+        searchGrid.innerHTML = "";
+        tools.forEach(t => searchGrid.appendChild(createToolCard(t)));
+        searchEmpty.style.display = tools.length === 0 ? "block" : "none";
+        searchCount.textContent = `共 ${tools.length} 個工具`;
+      }
+
+      searchInput.addEventListener("input", handleSearch);
+      showAllBtn.addEventListener("click", showAllTools);
+
+      renderCommon();
+      renderCategories();
+    })();
+  </script>
+
+  <!-- 全站共用按鈕 -->
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+</body>
+</html>
+
   </main>
 
   <!-- 工具／分類資料與渲染邏輯 -->
