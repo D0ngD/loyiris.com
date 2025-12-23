@@ -83,7 +83,14 @@
       "url": "/tools/drink-what.html",
       "category": "生活工具",
       "common": true
-    }
+	}
+	{,
+      "title": "隨機抽籤輪盤",
+      "icon": "/img/random-wheel.png",
+      "url": "/tools/random-wheel.html",
+      "category": "生活工具",
+      "common": true
+    }  
   ],
 
   "categories": [
