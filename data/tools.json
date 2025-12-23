@@ -33,7 +33,8 @@
       "category": "計算工具",
       "icon": "/img/counter.png",
       "url": "/tools/counter.html",
-      "common": true
+      "common": true,
+	  "created": "2025-12-11"
     },
     {
       "title": "進制轉換工具",
@@ -47,14 +48,16 @@
       "icon": "/img/convert-area.png",
       "url": "/tools/area-convert.html",
       "category": "換算工具",
-      "common": true
+      "common": true,
+      "created": "2025-12-09"
     },
     {
       "title": "年份換算",
       "icon": "/img/year.png",
       "url": "/tools/year-convert.html",
       "category": "換算工具",
-      "common": true
+      "common": true,
+	  "created": "2025-12-11"
     },
     {
       "title": "SHA1 雜湊產生器",
@@ -89,7 +92,8 @@
       "icon": "/img/random-wheel.png",
       "url": "/tools/random-wheel.html",
       "category": "生活工具",
-      "common": true
+      "common": true,
+	  "created": "2025-12-23"
     }  
   ],
 
