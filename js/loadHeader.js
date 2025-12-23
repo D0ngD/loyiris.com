@@ -23,8 +23,7 @@ function loadHeader(category = "", toolName = "") {
       if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark");
       }
-
-      // ⭐ 加入 SEO
+      
       applySEOMeta(category, toolName);
       applyBreadcrumbJSON(category, toolName);
     });
@@ -47,7 +46,7 @@ function mapCategoryId(name) {
 // SEO Meta 自動生成
 // =======================
 function applySEOMeta(category, toolName) {
-  const DOMAIN = "https://tools-loyiris.com";
+  const DOMAIN = "https://loyiris.com";
 
   // 自動 description
   let desc = "";
@@ -92,7 +91,7 @@ function applySEOMeta(category, toolName) {
 // Breadcrumb 結構化資料
 // =======================
 function applyBreadcrumbJSON(category, toolName) {
-  const DOMAIN = "https://tools-loyiris.com";
+  const DOMAIN = "https://loyiris.com";
 
   const list = [
     {
