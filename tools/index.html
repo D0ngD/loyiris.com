@@ -136,7 +136,7 @@
 
   function renderCommon() {
     commonGrid.innerHTML = "";
-    tools.filter(t => t.common).slice(0, 10)
+    tools.filter(t => t.common).slice(0, 6)
       .forEach(t => commonGrid.appendChild(createToolCard(t)));
   }
 
