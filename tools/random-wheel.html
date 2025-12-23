@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>隨機抽籤輪盤｜Roy Toolbox</title>
+  <meta name="description" content="隨機抽籤輪盤是一款簡單實用的線上工具，可自訂抽籤選項並透過轉盤隨機抽出結果，適合聚會、課堂活動與日常決策使用，支援手機與電腦。">
+
+  <!-- SEO：Breadcrumb（僅給搜尋引擎） -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "工具首頁",
+        "item": "https://loyiris.com/tools/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "生活工具",
+        "item": "https://loyiris.com/tools/categories/category-template.html?cat=life"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "隨機抽籤輪盤",
+        "item": "https://loyiris.com/tools/random-wheel.html"
+      }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+
+  <style>
+    /* 標題區：與卡片同寬置中 */
+    .tool-header {
+      max-width: 900px;
+      margin: 0 auto 16px;
+    }
+
+    /* 中央卡片（對齊 random-sentence） */
+    .wheel-card {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .tool-layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    .wheel-box {
+      flex: 1;
+      text-align: center;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 20px solid #ff6b6b;
+      margin: 0 auto 8px;
+    }
+
+    .result-box {
+      margin-top: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .option-box {
+      max-width: 360px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .option-box textarea {
+      width: 100%;
+      max-width: 100%;
+      min-height: 260px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    /* 說明文字（給 Google / AdSense） */
+    .tool-info {
+      max-width: 900px;
+      margin: 28px auto 0;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .tool-layout {
+        flex-direction: column;
+      }
+
+      .option-box {
+        max-width: none;
+      }
+
+      .wheel-card {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="header"></div>
+<script src="/js/loadHeader.js"></script>
+<script>
+  loadHeader("生活工具", "隨機抽籤輪盤");
+</script>
+
+<main>
+
+  <!-- 標題與說明（已置中） -->
+  <div class="tool-header">
+    <h1>隨機抽籤輪盤</h1>
+    <p class="tool-desc">
+      透過轉盤隨機抽出結果，快速又直觀，適合用來做選擇或活動抽籤。
+    </p>
+  </div>
+
+  <!-- 工具主卡片 -->
+  <section class="loy-card wheel-card">
+    <div class="tool-layout">
+
+      <!-- 左：輪盤 -->
+      <div class="wheel-box">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="360" height="360"></canvas>
+
+        <div class="tool-actions">
+          <button class="tool-btn" onclick="spin()">開始</button>
+          <button class="tool-btn secondary" onclick="resetWheel()">重設</button>
+        </div>
+
+        <div id="result" class="result-box"></div>
+      </div>
+
+      <!-- 右：選項 -->
+      <div class="option-box">
+        <label>抽籤選項（每行一個，最多 10 字）</label>
+        <textarea id="options" class="loy-input">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+        </textarea>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 說明區（避免薄內容） -->
+  <section class="tool-info">
+    <p>
+      隨機抽籤輪盤是一款免費的線上小工具，使用者可以自行輸入抽籤選項，
+      透過旋轉輪盤的方式隨機選出結果。常見應用情境包含課堂點名、
+      活動抽獎、聚會遊戲與日常決策輔助。
+    </p>
+    <p>
+      本工具所有運算皆於瀏覽器本地完成，不會上傳任何資料，
+      支援手機與電腦裝置，無需安裝即可立即使用。
+    </p>
+  </section>
+
+</main>
+
+<script>
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+let rotation = 0;
+let spinning = false;
+
+function getOptions() {
+  return document.getElementById("options")
+    .value
+    .split("\n")
+    .map(v => v.trim().slice(0, 10))
+    .filter(v => v);
+}
+
+function drawWheel() {
+  const options = getOptions();
+  if (options.length === 0) return;
+
+  const angle = (2 * Math.PI) / options.length;
+  const colors = ["#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff", "#a0c4ff", "#ffc6ff"];
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(180, 180);
+  ctx.rotate(rotation);
+
+  options.forEach((text, i) => {
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.arc(0, 0, 170, angle * i, angle * (i + 1));
+    ctx.fill();
+
+    ctx.save();
+    ctx.rotate(angle * i + angle / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#333";
+    ctx.font = "bold 16px Noto Sans TC";
+    ctx.fillText(text, 150, 6);
+    ctx.restore();
+  });
+
+  ctx.restore();
+}
+
+function spin() {
+  if (spinning) return;
+  const options = getOptions();
+  if (options.length < 2) return alert("至少需要兩個選項");
+
+  spinning = true;
+  const spinAngle = Math.random() * 2000 + 2000;
+  const start = performance.now();
+
+  function animate(t) {
+    const progress = Math.min((t - start) / 2000, 1);
+    rotation += (spinAngle * (1 - progress)) * 0.0005;
+    drawWheel();
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      spinning = false;
+      showResult();
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showResult() {
+  const options = getOptions();
+  const angle = (2 * Math.PI) / options.length;
+  const index = Math.floor(((2 * Math.PI - rotation % (2 * Math.PI)) % (2 * Math.PI)) / angle);
+  document.getElementById("result").textContent = `結果：${options[index]}`;
+}
+
+function resetWheel() {
+  rotation = 0;
+  document.getElementById("result").textContent = "";
+  drawWheel();
+}
+
+drawWheel();
+</script>
+
+<div id="global-buttons"></div>
+<script src="/js/global.js"></script>
+<script src="/js/loyui.js"></script>
+
+</body>
+</html>
