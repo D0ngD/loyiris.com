@@ -71,7 +71,7 @@
       "icon": "/img/encode-sha256.png",
       "url": "/tools/sha256.html",
       "category": "編碼解碼工具",
-      "common": true
+      "common": true,
 	  "created": "2025-12-29"
     },
     {
