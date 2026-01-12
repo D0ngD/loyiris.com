@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <!-- Google AdSense（可視需要保留） -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
+     crossorigin="anonymous"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>文本比較器｜Roy Toolbox</title>
+  <meta name="description" content="快速比較兩段文字差異，支援逐行比較與高亮顯示異動行，適合檢查文件修改、貼文差異。">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      font-family: "Noto Sans TC", sans-serif;
+    }
+
+    .tool-layout {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .column-box {
+      flex: 1 1 320px;
+      min-width: 0;
+    }
+
+    .column-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .text-area {
+      width: 100%;
+      min-height: 220px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      resize: vertical;
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      box-sizing: border-box;
+    }
+
+    .tool-actions {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tool-actions .tool-btn {
+      font-size: 13px;
+      padding: 8px 14px;
+    }
+
+    .result-card {
+      margin-top: 24px;
+    }
+
+    .diff-summary {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .diff-container {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .diff-panel {
+      flex: 1 1 320px;
+      min-width: 0;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .diff-panel-header {
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.02);
+    }
+
+    .diff-lines {
+      max-height: 360px;
+      overflow: auto;
+      font-family: "JetBrains Mono", "Consolas", monospace;
+      font-size: 12px;
+    }
+
+    .diff-line {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      padding: 3px 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .diff-line:last-child {
+      border-bottom: none;
+    }
+
+    .line-no {
+      text-align: right;
+      padding-right: 6px;
+      color: #999;
+      user-select: none;
+    }
+
+    .line-text {
+      white-space: pre-wrap;
+    }
+
+    /* 狀態色 */
+    .diff-line.same {
+      background: transparent;
+    }
+
+    .diff-line.changed {
+      background: #fff3cd;
+    }
+
+    .diff-line.added {
+      background: #d4f8d4;
+    }
+
+    .diff-line.removed {
+      background: #ffe0e0;
+    }
+
+    .diff-empty {
+      padding: 12px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    @media (max-width: 768px) {
+      .tool-layout {
+        flex-direction: column;
+      }
+
+      .diff-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <script>
+    const categoryName = "文本工具";
+    const toolName = "文本比較器";
+    loadHeader(categoryName, toolName);
+    document.title = `${toolName}｜Roy Toolbox`;
+  </script>
+
+  <main>
+    <nav class="breadcrumb">
+      <a href="/index.html">工具首頁</a> › 文本比較器
+    </nav>
+
+    <h1 class="tool-title">文本比較器</h1>
+    <p class="tool-desc">
+      貼上兩段文字，幫你逐行比較差異並高亮顯示異動行，適合檢查文件、貼文或程式碼的修改內容。
+    </p>
+
+    <div class="tool-layout">
+      <div class="column-box">
+        <div class="column-title">左側文本（原始版本）</div>
+        <textarea id="textLeft" class="text-area" placeholder="在這裡貼上原本的文字…"></textarea>
+      </div>
+
+      <div class="column-box">
+        <div class="column-title">右側文本（修改後版本）</div>
+        <textarea id="textRight" class="text-area" placeholder="在這裡貼上修改後的文字…"></textarea>
+      </div>
+    </div>
+
+    <div class="tool-actions">
+      <button class="tool-btn" onclick="compareText()">比較文本</button>
+      <button class="tool-btn secondary" onclick="swapText()">交換左右</button>
+      <button class="tool-btn secondary" onclick="clearText()">清除文本</button>
+      <button class="tool-btn secondary" onclick="copyRightToLeft()">右側覆蓋左側</button>
+    </div>
+
+    <div class="loy-divider"></div>
+
+    <section class="loy-card result-card">
+      <div id="diffSummary" class="diff-summary">尚未比較，請先貼上文字並點擊「比較文本」。</div>
+
+      <div class="diff-container">
+        <div class="diff-panel">
+          <div class="diff-panel-header">左側文本（逐行）</div>
+          <div id="diffLeft" class="diff-lines">
+            <div class="diff-empty">沒有資料。</div>
+          </div>
+        </div>
+
+        <div class="diff-panel">
+          <div class="diff-panel-header">右側文本（逐行）</div>
+          <div id="diffRight" class="diff-lines">
+            <div class="diff-empty">沒有資料。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+  <script>
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function compareText() {
+      const left = document.getElementById("textLeft").value;
+      const right = document.getElementById("textRight").value;
+      const diffLeft = document.getElementById("diffLeft");
+      const diffRight = document.getElementById("diffRight");
+      const summary = document.getElementById("diffSummary");
+
+      const leftLines = left.split(/\r?\n/);
+      const rightLines = right.split(/\r?\n/);
+      const maxLen = Math.max(leftLines.length, rightLines.length);
+
+      if (!left && !right) {
+        diffLeft.innerHTML = '<div class="diff-empty">沒有資料。</div>';
+        diffRight.innerHTML = '<div class="diff-empty">沒有資料。</div>';
+        summary.textContent = "請先貼上要比較的文字。";
+        return;
+      }
+
+      let same = 0, changed = 0, added = 0, removed = 0;
+      let htmlLeft = "";
+      let htmlRight = "";
+
+      for (let i = 0; i < maxLen; i++) {
+        const l = leftLines[i] !== undefined ? leftLines[i] : "";
+        const r = rightLines[i] !== undefined ? rightLines[i] : "";
+
+        let statusLeft = "same";
+        let statusRight = "same";
+
+        if (l === "" && r !== "") {
+          statusLeft = "added";
+          statusRight = "added";
+          added++;
+        } else if (l !== "" && r === "") {
+          statusLeft = "removed";
+          statusRight = "removed";
+          removed++;
+        } else if (l !== r) {
+          statusLeft = "changed";
+          statusRight = "changed";
+          changed++;
+        } else {
+          same++;
+        }
+
+        const lineNo = i + 1;
+
+        htmlLeft += `
+          <div class="diff-line ${statusLeft}">
+            <div class="line-no">${lineNo}</div>
+            <div class="line-text">${escapeHtml(l || " ")}</div>
+          </div>
+        `;
+
+        htmlRight += `
+          <div class="diff-line ${statusRight}">
+            <div class="line-no">${lineNo}</div>
+            <div class="line-text">${escapeHtml(r || " ")}</div>
+          </div>
+        `;
+      }
+
+      if (!htmlLeft) {
+        htmlLeft = '<div class="diff-empty">沒有資料。</div>';
+      }
+      if (!htmlRight) {
+        htmlRight = '<div class="diff-empty">沒有資料。</div>';
+      }
+
+      diffLeft.innerHTML = htmlLeft;
+      diffRight.innerHTML = htmlRight;
+
+      summary.textContent =
+        `比較完成：相同行 ${same}，修改行 ${changed}，新增行 ${added}，刪除行 ${removed}。`;
+    }
+
+    function swapText() {
+      const leftEl = document.getElementById("textLeft");
+      const rightEl = document.getElementById("textRight");
+      const tmp = leftEl.value;
+      leftEl.value = rightEl.value;
+      rightEl.value = tmp;
+      compareText();
+    }
+
+    function clearText() {
+      document.getElementById("textLeft").value = "";
+      document.getElementById("textRight").value = "";
+      document.getElementById("diffLeft").innerHTML =
+        '<div class="diff-empty">沒有資料。</div>';
+      document.getElementById("diffRight").innerHTML =
+        '<div class="diff-empty">沒有資料。</div>';
+      document.getElementById("diffSummary").textContent =
+        "尚未比較，請先貼上文字並點擊「比較文本」。";
+    }
+
+    function copyRightToLeft() {
+      const right = document.getElementById("textRight").value;
+      document.getElementById("textLeft").value = right;
+      compareText();
+    }
+  </script>
+</body>
+</html>
