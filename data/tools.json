@@ -14,6 +14,13 @@
       "category": "文本工具",
       "common": true
     },
+	{
+      "title": "文本比較器",
+      "url": "/tools/text-compare.html",
+      "icon": "/img/tools/text-compare.png",
+      "category": "文本工具",
+      "common:" true
+    },
     {
       "title": "隨機句產生器",
       "icon": "/img/lang-random-sentence.png",
