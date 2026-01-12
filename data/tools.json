@@ -16,8 +16,8 @@
     },
 	{
       "title": "文本比較器",
+	  "icon": "/img/text-compare.png",
       "url": "/tools/text-compare.html",
-      "icon": "/img/tools/text-compare.png",
       "category": "文本工具",
       "common:" true,
 	  "created": "2026-01-12"
