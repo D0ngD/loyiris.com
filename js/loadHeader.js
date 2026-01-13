@@ -7,7 +7,7 @@ function loadHeader(category = "", toolName = "") {
       const nameSpan = document.getElementById("toolName");
 
       // 麵包屑 HTML
-      let titleHTML = `<a href="https://loyiris.com/tools" class="crumb">Roy Dreambox</a>`;
+      let titleHTML = `<a href="https://loyiris.com/" class="crumb">Roy Dreambox</a>`;
 
       if (category) {
         titleHTML += ` ｜ <a href="/categories/category-template.html?cat=${mapCategoryId(category)}" class="crumb">${category}</a>`;
