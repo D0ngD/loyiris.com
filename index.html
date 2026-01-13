@@ -1,553 +1,244 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
-     crossorigin="anonymous"></script>
-  <title>RoyIris 小工具宇宙｜loyiris.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="RoyIris 小工具宇宙：提供文字處理、換算、編碼、生活抽籤等實用小工具。" />
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280" crossorigin="anonymous"></script>
 
-  <!-- 字體與共用樣式 -->
+  <title>Roy Dreambox｜免費、快速、無須安裝的線上工具集合</title>
+  <meta name="description" content="Roy Dreambox：匯集文本工具、換算工具、生活小工具、編碼工具等，快速、乾淨、手機可用、不需下載。">
+  <meta name="keywords" content="線上工具, 文本工具, 換算工具, BMI 計算, SHA1, 特殊符號, 隨機吃什麼, Roy Dreambox">
+
+  <meta property="og:title" content="Roy Dreambox｜免費、快速、無須安裝的線上工具集合">
+  <meta property="og:description" content="收錄多種實用線上工具，適合在桌機與筆電上使用。">
+  <meta property="og:image" content="/img/og-default.png">
+  <meta property="og:url" content="https://loyiris.com/">
+  <meta property="og:type" content="website">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="canonical" href="https://loyiris.com/">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/global.css" />
-  <link rel="stylesheet" href="/css/loyui.css" />
-
-  <style>
-    body {
-      font-family: "Noto Sans TC", sans-serif;
-    }
-
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px 16px 80px;
-    }
-
-    /* ====== 頂部導航 ====== */
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      backdrop-filter: blur(10px);
-      background: color-mix(in srgb, var(--bg) 85%, rgba(255,255,255,0.8));
-      border-bottom: 1px solid var(--border);
-    }
-    .site-header-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .brand-logo {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--loy-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-    }
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-    }
-    .brand-text-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .brand-text-sub {
-      font-size: 12px;
-      color: #777;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-    }
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text);
-      padding: 6px 10px;
-      border-radius: 999px;
-      transition: 0.2s;
-    }
-    .nav-links a:hover {
-      background: rgba(0,0,0,0.05);
-    }
-
-    @media (max-width: 720px) {
-      .site-header-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      .nav-links {
-        width: 100%;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-      }
-    }
-
-    /* ====== Hero 區塊 ====== */
-    .hero {
-      margin-top: 24px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
-      align-items: center;
-    }
-    @media (max-width: 900px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .hero-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.6);
-      border: 1px solid rgba(0,0,0,0.06);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      margin-bottom: 10px;
-    }
-
-    .hero-title {
-      font-size: 30px;
-      font-weight: 800;
-      line-height: 1.4;
-      margin-bottom: 10px;
-    }
-
-    .hero-title span#hero-typing {
-      display: inline-block;
-      background: var(--loy-gradient);
-      -webkit-background-clip: text;
-      color: transparent;
-      min-height: 1.2em;
-      border-right: 2px solid rgba(0,0,0,0.35);
-      padding-right: 4px;
-      animation: caretBlink 1s step-end infinite;
-    }
-
-    @keyframes caretBlink {
-      0%,100% { border-color: transparent; }
-      50%     { border-color: rgba(0,0,0,0.5); }
-    }
-
-    .hero-sub {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 16px;
-      max-width: 420px;
-    }
-
-    .hero-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .hero-buttons .tool-btn {
-      font-size: 14px;
-      padding: 9px 16px;
-      border-radius: 999px;
-    }
-
-    .hero-note {
-      font-size: 12px;
-      color: #999;
-    }
-
-    /* 右側視覺區塊 */
-    .hero-visual {
-      position: relative;
-      height: 260px;
-      border-radius: 24px;
-      background: radial-gradient(circle at top left, #f5e1cf 0, #d9c7b8 30%, #f4f0ea 100%);
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .hero-visual-inner-text {
-      text-align: center;
-      color: #5c4a3a;
-      z-index: 2;
-    }
-    .hero-visual-inner-text h2 {
-      font-size: 20px;
-      margin-bottom: 6px;
-    }
-    .hero-visual-inner-text p {
-      font-size: 13px;
-      opacity: 0.85;
-    }
-
-    /* 奶茶柔光粒子 */
-    .bubble {
-      position: absolute;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(255,255,255,0.95) 0, rgba(255,255,255,0.1) 60%, transparent 70%);
-      opacity: 0.7;
-      filter: blur(0.3px);
-      animation: floatBubble 18s infinite ease-in-out;
-    }
-
-    @keyframes floatBubble {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 0;
-      }
-      10% {
-        opacity: 0.7;
-      }
-      50% {
-        transform: translateY(-40px) scale(1.08);
-      }
-      90% {
-        opacity: 0.5;
-      }
-      100% {
-        transform: translateY(-80px) scale(0.98);
-        opacity: 0;
-      }
-    }
-
-    /* 讓每顆泡泡有不同速度與位置（用 nth-child） */
-    .hero-visual .bubble:nth-child(1)  { width: 90px; height: 90px; left: 8%;  top: 60%;  animation-duration: 22s; }
-    .hero-visual .bubble:nth-child(2)  { width: 50px; height: 50px; left: 70%; top: 65%;  animation-duration: 16s; animation-delay: -4s;}
-    .hero-visual .bubble:nth-child(3)  { width: 120px;height:120px; left: 60%; top: 10%;  animation-duration: 26s; animation-delay: -10s;}
-    .hero-visual .bubble:nth-child(4)  { width: 40px; height: 40px; left: 20%; top: 12%;  animation-duration: 14s; animation-delay: -6s;}
-    .hero-visual .bubble:nth-child(5)  { width: 70px; height: 70px; left: 35%; top: 70%;  animation-duration: 19s; animation-delay: -2s;}
-    .hero-visual .bubble:nth-child(6)  { width: 40px; height: 40px; left: 82%; top: 30%;  animation-duration: 17s; animation-delay: -8s;}
-    .hero-visual .bubble:nth-child(7)  { width: 100px;height:100px; left: 5%;  top: 20%;  animation-duration: 24s; animation-delay: -12s;}
-    .hero-visual .bubble:nth-child(8)  { width: 60px; height: 60px; left: 45%; top: 5%;   animation-duration: 20s; animation-delay: -3s;}
-
-    /* ====== 跳轉選單區 ====== */
-    .jump-section {
-      margin-top: 48px;
-    }
-    .jump-section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .jump-section-sub {
-      font-size: 13px;
-      color: #777;
-      margin-bottom: 16px;
-    }
-
-    .jump-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-    .jump-card {
-      border-radius: 16px;
-      padding: 16px 16px 14px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      cursor: pointer;
-      transition: 0.2s;
-      text-decoration: none;
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .jump-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    }
-    .jump-card-tag {
-      font-size: 11px;
-      color: #a47a4b;
-    }
-    .jump-card-title {
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .jump-card-desc {
-      font-size: 13px;
-      color: #666;
-      flex: 1;
-    }
-    .jump-card-foot {
-      font-size: 12px;
-      color: #999;
-    }
-
-    /* ====== 工具展示區 ====== */
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-top: 40px;
-      margin-bottom: 8px;
-    }
-    .section-sub {
-      font-size: 13px;
-      color: #777;
-      margin-bottom: 16px;
-    }
-
-    .tool-showcase {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
-    .tool-card-large {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 16px;
-      padding: 16px;
-      border-radius: 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      align-items: center;
-      text-decoration: none;
-      color: var(--text);
-      transition: 0.2s;
-    }
-
-    .tool-card-large:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    }
-
-    .tool-card-visual {
-      height: 120px;
-      border-radius: 14px;
-      background: radial-gradient(circle at top left, #fdf5ec 0, #f0e2cf 40%, #f8f4ee 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-    }
-    .tool-card-body-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .tool-card-body-cat {
-      font-size: 12px;
-      color: #aa8a6a;
-      margin-bottom: 6px;
-    }
-    .tool-card-body-desc {
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 6px;
-    }
-    .tool-card-body-meta {
-      font-size: 12px;
-      color: #999;
-    }
-
-    @media (max-width: 800px) {
-      .tool-card-large {
-        grid-template-columns: 1fr;
-      }
-      .tool-card-visual {
-        height: 90px;
-      }
-    }
-
-    /* ====== Footer ====== */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 16px;
-      font-size: 12px;
-      color: #888;
-      text-align: center;
-      margin-top: 36px;
-    }
-  </style>
 </head>
 
 <body>
 
-  <!-- 頂部 -->
-  <header class="site-header">
-    <div class="site-header-inner">
-      <div class="brand">
-        <div class="brand-logo">R</div>
-        <div class="brand-text">
-          <div class="brand-text-title">RoyIris Studio</div>
-          <div class="brand-text-sub">RoyTool & RoyAssistant</div>
-        </div>
-      </div>
-      <nav class="nav-links">
-        <a href="https://loyiris.com/">首頁</a>
-        <a href="https://loyiris.com/tools">電腦版工具</a>
-        <a href="https://tools.loyiris.com/">手機版工具</a>
-        <a href="https://loyiris.com/docs">文件參考</a>
-      </nav>
+<!-- Header -->
+<div id="header"></div>
+<script src="/js/loadHeader.js"></script>
+<script>loadHeader("");</script>
+
+<main>
+
+  <!-- 搜尋 -->
+  <div class="search-box">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="搜尋工具…（例如：吃什麼、SHA1、換算）"
+      aria-label="搜尋工具"
+    >
+  </div>
+
+  <!-- 最近新增工具 -->
+  <section id="recent-section" class="section">
+    <div class="section-title">
+      <span>最近新增工具</span>
+      <small>依新增時間排序</small>
     </div>
-  </header>
+    <div id="recentGrid" class="tool-grid"></div>
+  </section>
 
-  <main id="top">
-    <!-- Hero 區 -->
-    <section class="hero">
-      <!-- 左側文案 -->
-      <div>
-        <div class="hero-tag">
-          <span>✨</span>
-          <span>RoyTool & RoyAssistant</span>
+  <!-- 常用工具 -->
+  <section id="common-section" class="section">
+    <div class="section-title">
+      <span>常用工具</span>
+      <small>熱門工具</small>
+    </div>
+    <div id="commonGrid" class="tool-grid"></div>
+  </section>
+
+  <!-- 分類工具 -->
+  <section id="categories-section" class="section">
+    <div class="section-title">
+      <span>分類工具</span>
+      <small>依類型瀏覽</small>
+    </div>
+
+    <div id="categoriesContainer" class="categories-grid"></div>
+
+    <!-- 操作區 -->
+    <div style="display:flex; justify-content:space-between; gap:12px; margin-top:16px; flex-wrap:wrap;">
+      <a href="/docs/" class="tool-btn secondary" style="text-decoration:none;">
+        工具文件參考
+      </a>
+      <button id="showAllBtn" class="tool-btn secondary">
+        顯示所有工具
+      </button>
+    </div>
+  </section>
+
+  <!-- 搜尋 / 全部工具 -->
+  <section id="search-section" class="section hide">
+    <div class="section-title">
+      <span>工具列表</span>
+      <small id="searchCount"></small>
+    </div>
+    <div id="searchGrid" class="tool-grid"></div>
+    <div id="searchEmpty" style="display:none; color:#777; font-size:13px;">
+      沒有符合的工具
+    </div>
+  </section>
+
+</main>
+
+<!-- JS -->
+<script src="/js/category.js"></script>
+<script>
+(async function () {
+  const tools = await getTools();
+  const categories = await getCategories();
+
+  const recentGrid = document.getElementById("recentGrid");
+  const commonGrid = document.getElementById("commonGrid");
+  const categoriesContainer = document.getElementById("categoriesContainer");
+
+  const searchInput = document.getElementById("searchInput");
+  const searchSection = document.getElementById("search-section");
+  const recentSection = document.getElementById("recent-section");
+  const commonSection = document.getElementById("common-section");
+  const categoriesSection = document.getElementById("categories-section");
+  const searchGrid = document.getElementById("searchGrid");
+  const searchEmpty = document.getElementById("searchEmpty");
+  const searchCount = document.getElementById("searchCount");
+  const showAllBtn = document.getElementById("showAllBtn");
+
+  function createToolCard(t) {
+    const div = document.createElement("div");
+    div.className = "tool-card";
+    div.onclick = () => location.href = t.url;
+    div.innerHTML = `
+      <img src="${t.icon}" alt="${t.title}">
+      <div class="tool-title">${t.title}</div>
+    `;
+    return div;
+  }
+
+  function renderRecent() {
+    recentGrid.innerHTML = "";
+    tools
+      .filter(t => t.created)
+      .sort((a, b) => new Date(b.created) - new Date(a.created))
+      .slice(0, 6)
+      .forEach(t => recentGrid.appendChild(createToolCard(t)));
+  }
+
+  function renderCommon() {
+    commonGrid.innerHTML = "";
+    tools.filter(t => t.common).slice(0, 6)
+      .forEach(t => commonGrid.appendChild(createToolCard(t)));
+  }
+
+  function renderCategories() {
+    categoriesContainer.innerHTML = "";
+    categories.forEach(cat => {
+      const catTools = tools.filter(t => t.category === cat.key);
+      if (!catTools.length) return;
+
+      const block = document.createElement("div");
+      block.className = "category-block";
+      block.innerHTML = `
+        <div class="category-header">
+          <div class="category-name">${cat.key}</div>
+          <div class="category-desc">${cat.desc}</div>
         </div>
+      `;
 
-        <h1 class="hero-title">
-          <span id="hero-typing"></span>
-        </h1>
+      const list = document.createElement("div");
+      list.className = "category-tools";
+      catTools.slice(0, 2).forEach(t => list.appendChild(createToolCard(t)));
 
-        <p class="hero-sub">
-          從文字處理、單位換算到「今天吃什麼、喝什麼」，
-          未來會變成你的全能助理小洛伊。
-        </p>
+      block.appendChild(list);
+      block.insertAdjacentHTML(
+        "beforeend",
+        `<div class="category-footer">
+           <a class="more-link" href="/categories/category-template.html?cat=${cat.id}">More →</a>
+         </div>`
+      );
 
-        <div class="hero-buttons">
-          <a href="https://tools.loyiris.com/" class="tool-btn">手機版 RoyTool</a>
-          <a href="/tools/index.html" class="tool-btn secondary">電腦版 RoyTool</a>
-        </div>
+      categoriesContainer.appendChild(block);
+    });
+  }
 
-        <div class="hero-note">
-          目前手機版僅有網頁瀏覽，未來會選擇其中熱門工具開發成方便攜帶的APP。
-        </div>
-      </div>
-
-      <!-- 右側奶茶柔光粒子區 -->
-      <div class="hero-visual">
-        <!-- 奶茶宇宙小光點 -->
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-
-        <div class="hero-visual-inner-text">
-          <h2>RoyIris</h2>
-          <p>致力於讓生活更加便利。<br>RoyAssistant正在開發中，將於未來推出。</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 跳轉選單區 -->
-    <section class="jump-section">
-      <h2 class="jump-section-title">要去哪一邊逛逛？</h2>
-      <p class="jump-section-sub">緩慢增加新工具中，歡迎將這個網頁入書籤列/我的最愛</p>
-      <div class="jump-grid">
-        <!-- 手機版 RoyTool -->
-        <a id="mobile-tools" class="jump-card" href="https://tools.loyiris.com/">
-          <div class="jump-card-tag">手機版</div>
-          <div class="jump-card-title">前往 手機版工具頁面</div>
-          <div class="jump-card-desc">
-            針對手機螢幕設計的工具介面，適合日常快速使用與隨身查詢。
-			未來可能會開發成APP。
-          </div>
-          <div class="jump-card-foot">前往 tools-royiris.com</div>
-        </a>
-
-        <!-- 電腦版 loyiris Tools -->
-        <a id="desktop-tools" class="jump-card" href="/tools/index.html">
-          <div class="jump-card-tag">電腦版</div>
-          <div class="jump-card-title">前往 電腦版工具頁面</div>
-          <div class="jump-card-desc">
-            在桌機上使用時更加舒適，支援鍵盤操作、寬版文字區與更完整的內容說明，方便工作與寫報告時使用。
-          </div>
-          <div class="jump-card-foot">查看所有電腦版工具</div>
-        </a>
-
-        <!-- 文件參考 -->
-        <a class="jump-card" href="/docs/index.html">
-          <div class="jump-card-tag">參考資料</div>
-          <div class="jump-card-title">工具原理 & Wiki 連結整理</div>
-          <div class="jump-card-desc">
-            想知道 Base64、SHA-1、BMI、進位制與各種單位背後的定義與計算方式？這裡整理好官方／維基百科連結。
-          </div>
-          <div class="jump-card-foot">前往文件參考頁面</div>
-        </a>
-      </div>
-    </section>
-
-<div class="recent-tools" style="margin-bottom: 32px;">
-  <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
-    最近新增工具
-  </h3>
-  <ul style="line-height: 1.8; color: #555;">
-    <li>2025.12.15　新增計數器工具</li>
-    <li>2025.12.11　各國年份換算工具</li>
-    <li>2025.12.09　面積換算工具</li>
-  </ul>
-</div>
-
-
-    <footer>
-      © 2025 RoyIris Studio．有建議或是想要新增的工具可以來信至：auuse698@gmil.com
-    </footer>
-  </main>
-
-  <script>
-    // ===== 打字特效 =====
-    const typingTexts = [
-      "免費好用的小工具平台",
-      "你的生活助手",
-      "你的創作搭檔",
-      "簡單、快速、好用的小工具平台"
-    ];
-
-    const typingEl = document.getElementById("hero-typing");
-    let tIndex = 0;
-    let charIndex = 0;
-    let deleting = false;
-
-    function typeLoop() {
-      const text = typingTexts[tIndex];
-
-      if (!deleting) {
-        charIndex++;
-        typingEl.textContent = text.slice(0, charIndex);
-        if (charIndex === text.length) {
-          setTimeout(() => { deleting = true; }, 1400);
-        }
-      } else {
-        charIndex--;
-        typingEl.textContent = text.slice(0, charIndex);
-        if (charIndex === 0) {
-          deleting = false;
-          tIndex = (tIndex + 1) % typingTexts.length;
-        }
-      }
-      const delay = deleting ? 55 : 100;
-      setTimeout(typeLoop, delay);
+  function handleSearch() {
+    const key = searchInput.value.trim().toLowerCase();
+    if (!key) {
+      searchSection.classList.add("hide");
+      recentSection.classList.remove("hide");
+      commonSection.classList.remove("hide");
+      categoriesSection.classList.remove("hide");
+      return;
     }
 
-    typeLoop();
-  </script>
+    searchSection.classList.remove("hide");
+    recentSection.classList.add("hide");
+    commonSection.classList.add("hide");
+    categoriesSection.classList.add("hide");
+
+    const result = tools.filter(t =>
+      t.title.toLowerCase().includes(key) ||
+      t.category.toLowerCase().includes(key)
+    );
+
+    searchGrid.innerHTML = "";
+    result.forEach(t => searchGrid.appendChild(createToolCard(t)));
+    searchEmpty.style.display = result.length ? "none" : "block";
+    searchCount.textContent = result.length
+      ? `共 ${result.length} 個工具符合「${key}」`
+      : "";
+  }
+
+  function showAllTools() {
+    searchInput.value = "";
+    searchSection.classList.remove("hide");
+    recentSection.classList.add("hide");
+    commonSection.classList.add("hide");
+    categoriesSection.classList.add("hide");
+
+    searchGrid.innerHTML = "";
+    tools.forEach(t => searchGrid.appendChild(createToolCard(t)));
+    searchEmpty.style.display = tools.length ? "none" : "block";
+    searchCount.textContent = `共 ${tools.length} 個工具`;
+  }
+
+  searchInput.addEventListener("input", handleSearch);
+  showAllBtn.addEventListener("click", showAllTools);
+
+  renderRecent();
+  renderCommon();
+  renderCategories();
+})();
+</script>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span>© 2026 RoyIris Studio. All rights reserved.</span>
+      </div>
+      <nav class="footer-links" aria-label="網站資訊連結">
+        <a href="/about.html">關於我們</a>
+        <a href="/terms.html">服務條款</a>
+        <a href="/disclaimer.html">免責聲明</a>
+        <a href="/privacy.html">隱私權政策</a>
+        <a href="mailto:auuse698@gmil.com">聯絡我們</a>
+      </nav>
+    </div>
+  </footer>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
 </body>
 </html>
