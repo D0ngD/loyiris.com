@@ -43,3 +43,41 @@ body {
 .global-btn:hover {
   transform: scale(1.1);
 }
+/* ===== Site Footer ===== */
+.site-footer {
+  margin-top: 40px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 13px;
+}
+body.dark .site-footer {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.footer-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.footer-links a {
+  margin-right: 12px;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.footer-links a:last-child {
+  margin-right: 0;
+}
+
+.footer-links a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
