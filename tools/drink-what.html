@@ -2,9 +2,9 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
      crossorigin="anonymous"></script>
-  <title>隨機喝什麼｜Roy Toolbox</title>
+  <title>隨機喝什麼｜Roy Dreambox</title>
   <meta name="description" content="隨機喝什麼：幫你抽出今日飲料卡，含動畫、預設飲料清單、避免重複抽中功能。免費免安裝，線上可用。">
 
   <link rel="stylesheet" href="/global.css">
@@ -224,7 +224,6 @@
             <div id="drawSub" class="draw-sub">準備好後按下開始抽吧！</div>
           </div>
 
-          <!-- 修復後的按鈕區 -->
           <div class="btn-row">
             <button id="btnDraw" class="tool-btn">開始抽</button>
             <button id="btnReDraw" class="tool-btn secondary" disabled>再抽一次</button>
@@ -269,7 +268,18 @@
     const drawSub = document.getElementById("drawSub");
 
     let lastChoice = null;
+
+    /* 動畫控制：避免連點造成 interval 疊加 */
     let flashTimer = null;
+    let flashToken = 0;   // 每次抽卡 +1，用來取消上一輪
+    let isDrawing = false;
+
+    function stopFlash() {
+      if (flashTimer) {
+        clearInterval(flashTimer);
+        flashTimer = null;
+      }
+    }
 
     /* --------------------------
        初始化預設飲料
@@ -312,21 +322,32 @@
     }
 
     /* --------------------------
-       抽卡跑馬燈動畫
+       抽卡跑馬燈動畫（可取消）
     --------------------------- */
     function startFlash(items, duration = 800) {
+      stopFlash();
+      const myToken = ++flashToken;
+
       return new Promise(resolve => {
         let idx = 0;
 
         flashTimer = setInterval(() => {
+          // 若已被新一輪抽卡取消，就停止
+          if (myToken !== flashToken) {
+            stopFlash();
+            return;
+          }
           drawMain.textContent = items[idx];
           drawEmoji.textContent = "✨";
           idx = (idx + 1) % items.length;
         }, 70);
 
         setTimeout(() => {
-          clearInterval(flashTimer);
-          resolve();
+          // 只有同一輪 token 才能結束並回傳
+          if (myToken === flashToken) {
+            stopFlash();
+            resolve();
+          }
         }, duration);
       });
     }
@@ -365,49 +386,64 @@
       drawCard.classList.remove("animate");
       void drawCard.offsetWidth;
       drawCard.classList.add("animate");
+    }
 
-      btnReDraw.disabled = false;
+    /* --------------------------
+       安全抽卡：防連點 + 取消上一輪
+    --------------------------- */
+    async function doDraw() {
+      if (isDrawing) return; // 抽卡中就忽略連點
+      isDrawing = true;
+
+      btnDraw.disabled = true;
+      btnReDraw.disabled = true;
+
+      try {
+        const items = getItems();
+        showError("");
+
+        if (items.length === 0) {
+          showError("清單是空的，請先輸入或載入預設飲料。");
+          return;
+        }
+
+        await startFlash(items, 900);
+        updateResult(pickOne());
+      } finally {
+        btnDraw.disabled = false;
+        btnReDraw.disabled = (lastChoice === null);
+        isDrawing = false;
+      }
     }
 
     /* --------------------------
        按鈕事件
     --------------------------- */
     btnClearList.onclick = () => {
+      // 取消並停止任何正在跑的動畫
+      flashToken++;
+      stopFlash();
+
       itemInput.value = "";
       updateCount();
       showError("");
+
+      lastChoice = null;
       btnReDraw.disabled = true;
+
       drawMain.textContent = "尚未抽卡";
       drawSub.textContent = "請輸入清單後再抽取～";
       drawEmoji.textContent = "🥤";
     };
 
-    btnDraw.onclick = async () => {
-      const items = getItems();
-      showError("");
+    btnDraw.onclick = doDraw;
+    btnReDraw.onclick = doDraw;
 
-      if (items.length === 0) {
-        showError("清單是空的，請先輸入或載入預設飲料。");
-        return;
-      }
-
-      await startFlash(items, 900);
-      updateResult(pickOne());
-    };
-
-    btnReDraw.onclick = async () => {
-      const items = getItems();
-      if (items.length === 0) return;
-
-      await startFlash(items, 900);
-      updateResult(pickOne());
-    };
-
-    /* Space 快速抽卡 */
+    /* Space 快速抽卡（抽卡中也不會亂掉） */
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
         e.preventDefault();
-        btnDraw.click();
+        doDraw();
       }
     });
 
@@ -417,9 +453,7 @@
     });
 
     loadDefault();
-
   </script>
-
 
   <div id="global-buttons"></div>
   <script src="/js/global.js"></script>
