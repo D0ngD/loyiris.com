@@ -7,7 +7,7 @@ function loadHeader(category = "", toolName = "") {
       const nameSpan = document.getElementById("toolName");
 
       // 麵包屑 HTML
-      let titleHTML = `<a href="https://loyiris.com/tools" class="crumb">Roy Toolbox</a>`;
+      let titleHTML = `<a href="https://loyiris.com/tools" class="crumb">Roy Dreambox</a>`;
 
       if (category) {
         titleHTML += ` ｜ <a href="/categories/category-template.html?cat=${mapCategoryId(category)}" class="crumb">${category}</a>`;
@@ -51,11 +51,11 @@ function applySEOMeta(category, toolName) {
   // 自動 description
   let desc = "";
   if (toolName) {
-    desc = `${toolName}：在 Roy Toolbox 中免費線上使用的工具，支援即時操作、免安裝、手機可用。`;
+    desc = `${toolName}：在 Roy Dreambox 中免費線上使用的工具，支援即時操作、免安裝、手機可用。`;
   } else if (category) {
-    desc = `${category}：Roy Toolbox 的工具分類，提供多項線上工具可使用。`;
+    desc = `${category}：Roy Dreambox 的工具分類，提供多項線上工具可使用。`;
   } else {
-    desc = "Roy Toolbox：免費、快速的線上小工具集合。";
+    desc = "Roy Dreambox：免費、快速的線上小工具集合。";
   }
 
   const head = document.querySelector("head");
@@ -69,7 +69,7 @@ function applySEOMeta(category, toolName) {
   // keywords
   const metaKey = document.createElement("meta");
   metaKey.name = "keywords";
-  metaKey.content = `${toolName || category || "工具"}, Roy Toolbox, 線上工具, 免費工具`;
+  metaKey.content = `${toolName || category || "工具"}, Roy Dreambox, 線上工具, 免費工具`;
   head.appendChild(metaKey);
 
   // --- Open Graph ---
@@ -80,7 +80,7 @@ function applySEOMeta(category, toolName) {
     head.appendChild(m);
   };
 
-  og("og:title", toolName ? `${toolName}｜Roy Toolbox` : "Roy Toolbox");
+  og("og:title", toolName ? `${toolName}｜Roy Dreambox` : "Roy Dreambox");
   og("og:description", desc);
   og("og:type", "website");
   og("og:url", location.href);
