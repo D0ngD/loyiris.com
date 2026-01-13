@@ -2,10 +2,11 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
      crossorigin="anonymous"></script>
-  <title>隨機吃什麼｜Roy Toolbox</title>
-<meta name="description" content="隨機吃什麼：抽出今日餐點卡，搭配特製動畫與預設清單，避免重複抽中，適合選擇困難症使用。免費免安裝，線上可用。">
+
+  <title>隨機吃什麼｜Roy Dreambox</title>
+  <meta name="description" content="隨機吃什麼：抽出今日餐點卡，搭配特製動畫與預設清單，避免重複抽中，適合選擇困難症使用。免費免安裝，線上可用。">
 
   <link rel="stylesheet" href="/global.css">
   <link rel="stylesheet" href="/css/loyui.css">
@@ -28,7 +29,6 @@
       .layout { grid-template-columns: 1fr; }
     }
 
-    /* 左側 textarea */
     .loy-textarea {
       width: 100%;
       min-height: 240px;
@@ -64,7 +64,6 @@
       color: #666;
     }
 
-    /* 抽卡卡片（縮小版） */
     .draw-card-wrapper {
       display: flex;
       flex-direction: column;
@@ -124,7 +123,6 @@
       text-align: center;
     }
 
-    /* 抽卡動畫 */
     .draw-card.animate {
       animation: loyCardPop 0.6s ease-out;
     }
@@ -151,7 +149,6 @@
       transition: opacity .4s;
     }
   </style>
-
 </head>
 
 <body>
@@ -168,7 +165,6 @@
 
       <!-- 左側 -->
       <section class="loy-card">
-
         <div class="panel-header">
           <div id="itemCount" class="count-text">目前 0 個選項</div>
           <button id="btnClearList" class="tool-btn secondary">清空菜單</button>
@@ -183,7 +179,6 @@
 
         <div id="errorMsg"></div>
         <div id="hintMsg">預設菜單已載入</div>
-
       </section>
 
       <!-- 右側 -->
@@ -215,140 +210,66 @@
 
   <script>
     const defaultItems = [
-  "台式便當",
-  "燒臘便當",
-  "滷肉飯",
-  "雞肉飯",
-  "排骨飯",
-  "豬腳飯",
-  "鴨肉飯",
-  "控肉飯",
-  "油飯",
-  "台式早餐",
-  "鐵板麵",
-  "鍋燒意麵",
-  "陽春麵",
-  "牛肉麵",
-  "麻醬麵",
-  "乾麵",
-  "湯麵",
-  "榨菜肉絲麵",
-  "擔仔麵",
-  "滷味",
-  "炒飯",
-  "蛋炒飯",
-  "炒麵",
-  "炒冬粉",
-  "蚵仔麵線",
-  "肉羹",
-  "魷魚羹",
-  "四神湯",
-  "排骨酥湯",
-  "貢丸湯",
-  "小籠包",
-  "湯包",
-  "生煎包",
-  "水餃",
-  "鍋貼",
-  "蔥油餅",
-  "燒餅油條",
-  "胡椒餅",
-  "蔥抓餅",
-  "蛋餅",
-  "鹹酥雞",
-  "炸物拼盤",
-  "鹽水雞",
-  "關東煮",
-  "台式串燒",
-  "滷味（熱滷）",
-  "蚵仔煎",
-  "大腸包小腸",
-  "臭豆腐（炸）",
-  "臭豆腐（麻辣）",
-  "熱炒",
-  "海鮮快炒",
-  "粥品",
-  "廣東粥",
-  "砂鍋魚頭",
-  "牛排館",
-  "美式漢堡",
-  "美式炸雞",
-  "炸魚薯條",
-  "披薩",
-  "義大利麵",
-  "義式燉飯",
-  "焗烤料理",
-  "法式吐司",
-  "早午餐",
-  "三明治",
-  "沙拉",
-  "健康餐盒",
-  "素食自助餐",
-  "蔬食義大利麵",
-  "日式拉麵",
-  "日式咖哩",
-  "丼飯",
-  "壽司",
-  "手卷",
-  "日式定食",
-  "烏龍麵",
-  "天婦羅",
-  "炸豬排",
-  "章魚燒",
-  "韓式料理",
-  "韓式炸雞",
-  "部隊鍋",
-  "韓式烤肉",
-  "石鍋拌飯",
-  "泡菜鍋",
-  "嫩豆腐鍋",
-  "辣炒年糕",
-  "海鮮煎餅",
-  "紫菜飯捲",
-  "泰式料理",
-  "越南河粉",
-  "越南法國麵包",
-  "印尼料理",
-  "馬來料理",
-  "印度咖哩",
-  "新加坡料理",
-  "麻辣燙",
-  "火鍋",
-  "燒烤"
-];
-
+      "台式便當","燒臘便當","滷肉飯","雞肉飯","排骨飯","豬腳飯","鴨肉飯","控肉飯","油飯",
+      "台式早餐","鐵板麵","鍋燒意麵","陽春麵","牛肉麵","麻醬麵","乾麵","湯麵","榨菜肉絲麵","擔仔麵",
+      "滷味","炒飯","蛋炒飯","炒麵","炒冬粉","蚵仔麵線","肉羹","魷魚羹","四神湯","排骨酥湯","貢丸湯",
+      "小籠包","湯包","生煎包","水餃","鍋貼","蔥油餅","燒餅油條","胡椒餅","蔥抓餅","蛋餅",
+      "鹹酥雞","炸物拼盤","鹽水雞","關東煮","台式串燒","滷味（熱滷）","蚵仔煎","大腸包小腸","臭豆腐（炸）","臭豆腐（麻辣）",
+      "熱炒","海鮮快炒","粥品","廣東粥","砂鍋魚頭",
+      "牛排館","美式漢堡","美式炸雞","炸魚薯條","披薩","義大利麵","義式燉飯","焗烤料理","法式吐司","早午餐","三明治","沙拉","健康餐盒",
+      "素食自助餐","蔬食義大利麵",
+      "日式拉麵","日式咖哩","丼飯","壽司","手卷","日式定食","烏龍麵","天婦羅","炸豬排","章魚燒",
+      "韓式料理","韓式炸雞","部隊鍋","韓式烤肉","石鍋拌飯","泡菜鍋","嫩豆腐鍋","辣炒年糕","海鮮煎餅","紫菜飯捲",
+      "泰式料理","越南河粉","越南法國麵包","印尼料理","馬來料理","印度咖哩","新加坡料理",
+      "麻辣燙","火鍋","燒烤"
+    ];
 
     const itemInput = document.getElementById("itemInput");
     const itemCount = document.getElementById("itemCount");
     const errorMsg = document.getElementById("errorMsg");
     const hintMsg = document.getElementById("hintMsg");
     const chkNoRepeat = document.getElementById("chkNoRepeat");
+
     const btnClearList = document.getElementById("btnClearList");
     const btnDraw = document.getElementById("btnDraw");
     const btnReDraw = document.getElementById("btnReDraw");
+
     const drawCard = document.getElementById("drawCard");
     const drawEmoji = document.getElementById("drawEmoji");
     const drawMain = document.getElementById("drawMain");
     const drawSub = document.getElementById("drawSub");
 
     let lastChoice = null;
+
+    /* === 修復連點永動機：動畫控制 === */
     let flashTimer = null;
+    let flashToken = 0;
+    let isDrawing = false;
+
+    function stopFlash() {
+      if (flashTimer) {
+        clearInterval(flashTimer);
+        flashTimer = null;
+      }
+    }
 
     function loadDefault() {
       itemInput.value = defaultItems.join("\n");
       updateCount();
       showHint("預設菜單已載入");
     }
+
     function getItems() {
       return itemInput.value
         .split(/\r?\n/)
         .map(v => v.trim())
         .filter(v => v.length > 0);
     }
+
     function updateCount() {
-      const count = getItems().length;
-      itemCount.textContent = `目前 ${count} 個選項`;
+      itemCount.textContent = `目前 ${getItems().length} 個選項`;
     }
+
     function showHint(msg) {
       hintMsg.textContent = msg;
       hintMsg.style.display = "block";
@@ -358,32 +279,46 @@
         setTimeout(() => hintMsg.style.display = "none", 400);
       }, 1200);
     }
+
     function showError(msg) {
-      if (!msg) { errorMsg.style.display = "none"; return; }
+      if (!msg) {
+        errorMsg.style.display = "none";
+        return;
+      }
       errorMsg.textContent = msg;
       errorMsg.style.display = "block";
     }
 
+    /* 抽卡跑馬燈動畫（可取消） */
     function startFlash(items, duration = 800) {
+      stopFlash();
+      const myToken = ++flashToken;
+
       return new Promise(resolve => {
         let idx = 0;
 
         flashTimer = setInterval(() => {
+          if (myToken !== flashToken) {
+            stopFlash();
+            return;
+          }
           drawMain.textContent = items[idx];
           drawEmoji.textContent = "✨";
           idx = (idx + 1) % items.length;
         }, 70);
 
         setTimeout(() => {
-          clearInterval(flashTimer);
-          resolve();
+          if (myToken === flashToken) {
+            stopFlash();
+            resolve();
+          }
         }, duration);
       });
     }
 
     function pickOne() {
       const items = getItems();
-      if (items.length === 0) return null;
+      if (!items.length) return null;
 
       let choice = items[Math.floor(Math.random() * items.length)];
 
@@ -394,6 +329,7 @@
           safe++;
         }
       }
+
       lastChoice = choice;
       return choice;
     }
@@ -402,7 +338,7 @@
       if (!choice) return;
 
       const emojis = ["🍱","🍜","🍕","🥗","🍛","🍔","🍣","🥟","🍲","🌯","🍗","🥪"];
-      drawEmoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      drawEmoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
       drawMain.textContent = choice;
       drawSub.textContent = "就決定是它了！";
@@ -410,78 +346,92 @@
       drawCard.classList.remove("animate");
       void drawCard.offsetWidth;
       drawCard.classList.add("animate");
-
-      btnReDraw.disabled = false;
     }
+
+    /* 安全抽卡：抽卡期間鎖按鈕 + 防連點 */
+    async function doDraw() {
+      if (isDrawing) return;
+      isDrawing = true;
+
+      btnDraw.disabled = true;
+      btnReDraw.disabled = true;
+
+      try {
+        const items = getItems();
+        showError("");
+
+        if (items.length === 0) {
+          showError("清單是空的，請先輸入或載入預設菜單。");
+          return;
+        }
+
+        await startFlash(items, 900);
+        updateResult(pickOne());
+      } finally {
+        btnDraw.disabled = false;
+        btnReDraw.disabled = (lastChoice === null);
+        isDrawing = false;
+      }
+    }
+
     btnClearList.onclick = () => {
+      /* 清空時強制停掉動畫 + 取消任何正在跑的抽卡 */
+      flashToken++;
+      stopFlash();
+
       itemInput.value = "";
       updateCount();
       showError("");
+
+      lastChoice = null;
       btnReDraw.disabled = true;
+
       drawMain.textContent = "尚未抽卡";
       drawSub.textContent = "請輸入清單後再抽取～";
       drawEmoji.textContent = "🎲";
     };
 
-    btnDraw.onclick = async () => {
-      const items = getItems();
-      showError("");
+    btnDraw.onclick = doDraw;
+    btnReDraw.onclick = doDraw;
 
-      if (items.length === 0) {
-        showError("清單是空的，請先輸入或載入預設菜單。");
-        return;
-      }
-      await startFlash(items, 900);
-      const final = pickOne();
-      updateResult(final);
-    };
-
-    btnReDraw.onclick = async () => {
-      const items = getItems();
-      if (items.length === 0) return;
-
-      await startFlash(items, 900);
-      updateResult(pickOne());
-    };
-
+    /* Space 快速抽卡 */
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && !["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) {
         e.preventDefault();
-        btnDraw.click();
+        doDraw();
       }
     });
+
     itemInput.addEventListener("input", () => {
       updateCount();
       showError("");
     });
+
     loadDefault();
   </script>
+
   <div id="global-buttons"></div>
-<style>
-  /* 只調整外觀，不加 tool-btn 以避免破壞圓形 */
-  #global-buttons .global-btn {
-    background: var(--card-bg) !important;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 20px !important;
-    border-radius: 50% !important;
-    width: 48px !important;
-    height: 48px !important;
-    padding: 0 !important;
-  }
 
-  #global-buttons .global-btn:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.20);
-    transform: scale(1.08);
-  }
+  <style>
+    /* 只調整外觀，不加 tool-btn 以避免破壞圓形 */
+    #global-buttons .global-btn {
+      background: var(--card-bg) !important;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 20px !important;
+      border-radius: 50% !important;
+      width: 48px !important;
+      height: 48px !important;
+      padding: 0 !important;
+    }
 
-
-</style>
-
-
+    #global-buttons .global-btn:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.20);
+      transform: scale(1.08);
+    }
+  </style>
 
   <script src="/js/global.js"></script>
   <script src="/js/loyui.js"></script>
-
 </body>
 </html>
