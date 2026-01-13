@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Home -->
+  <!-- Home & Static pages -->
   <url>
     <loc>https://loyiris.com/</loc>
   </url>
-
-  <!-- Categories (分類首頁) -->
   <url>
-    <loc>https://loyiris.com/</loc>
+    <loc>https://loyiris.com/about.html</loc>
+  </url>
+  <url>
+    <loc>https://loyiris.com/terms.html</loc>
+  </url>
+  <url>
+    <loc>https://loyiris.com/disclaimer.html</loc>
+  </url>
+  <url>
+    <loc>https://loyiris.com/privacy.html</loc>
+  </url>
+  <url>
+    <loc>https://loyiris.com/docs/</loc>
   </url>
 
   <!-- Category pages -->
@@ -31,12 +41,15 @@
     <loc>https://loyiris.com/categories/category-template.html?cat=life</loc>
   </url>
 
-  <!-- 工具頁面 (from tools.json) -->
+  <!-- Tool pages (from tools.json) -->
   <url>
     <loc>https://loyiris.com/tools/special-symbols</loc>
   </url>
   <url>
     <loc>https://loyiris.com/tools/text-flip-sort</loc>
+  </url>
+  <url>
+    <loc>https://loyiris.com/tools/text-compare</loc>
   </url>
   <url>
     <loc>https://loyiris.com/tools/random-sentence</loc>
@@ -57,6 +70,12 @@
     <loc>https://loyiris.com/tools/sha256</loc>
   </url>
   <url>
+    <loc>https://loyiris.com/tools/base64</loc>
+  </url>
+  <url>
+    <loc>https://loyiris.com/tools/year-convert</loc>
+  </url>
+  <url>
     <loc>https://loyiris.com/tools/eat-what</loc>
   </url>
   <url>
@@ -66,12 +85,7 @@
     <loc>https://loyiris.com/tools/counter</loc>
   </url>
   <url>
-    <loc>https://loyiris.com/tools/year-convert</loc>
-  </url>
-  <url>
-    <loc>https://loyiris.com/tools/base64</loc>
-  </url>
-  <url>
     <loc>https://loyiris.com/tools/random-wheel</loc>
   </url>
+
 </urlset>
