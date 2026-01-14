@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>特務天賦鑑定｜特務村冒險心理測驗</title>
+  <style>
+    :root {
+      --bg-top: #E5E5E5;
+      --bg-bottom: #CFCFCF;
+      --accent: #4A5568;
+      --accent-soft: #718096;
+      --card-bg: #FFFFFF;
+      --text-main: #525c6e;
+      --text-sub: #718096;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --fast: 0.25s ease;
+
+      /* 新增：結果文字自動縮放倍率 */
+      --result-text-scale: 1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "Noto Sans TC", sans-serif;
+      color: var(--text-main);
+      background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    main.app {
+      width: 100%;
+      max-width: 960px;
+      padding: 16px;
+      margin: 0 auto;
+    }
+
+    .hidden { display: none !important; }
+
+    /* 頁首 */
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .app-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 18px rgba(113, 128, 150, 0.15);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .app-title {
+      font-size: 26px;
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .app-subtitle {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 介紹畫面 */
+
+    #intro-screen { margin-top: 8px; }
+
+    .intro-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .intro-main-text h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .intro-main-text p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    .intro-tags {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .intro-tag-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(113, 128, 150, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(113, 128, 150, 0.2);
+    }
+
+    .intro-mini-note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-sub);
+      opacity: 0.8;
+    }
+
+    .intro-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-placeholder {
+      width: 260px;
+      height: 260px;
+      max-width: 100%;
+      border-radius: 32px;
+      background: linear-gradient(145deg, #F7FAFC, #EDF2F7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .avatar-placeholder img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .avatar-caption {
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: center;
+    }
+
+    .avatar-caption span {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .intro-button-row {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      padding: 11px 24px;
+      border-radius: 999px;
+      box-shadow: 0 14px 25px rgba(74, 85, 104, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform var(--fast),
+        box-shadow var(--fast), filter var(--fast);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+      box-shadow: 0 18px 32px rgba(74, 85, 104, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 18px rgba(74, 85, 104, 0.25);
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-sub);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--fast), transform var(--fast),
+        box-shadow var(--fast);
+    }
+
+    .btn-secondary:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* 測驗畫面 */
+
+    #quiz-screen { margin-top: 14px; }
+
+    .quiz-card {
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .quiz-card.fade-out {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .quiz-card.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .quiz-progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .quiz-progress-bar {
+      position: relative;
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .quiz-progress-bar-fill {
+      position: absolute;
+      inset: 0;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+      transition: width 0.25s ease;
+    }
+
+    .quiz-progress-text {
+      font-size: 11px;
+      color: var(--text-sub);
+      min-width: 60px;
+      text-align: right;
+    }
+
+    .quiz-question-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #999;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .quiz-question-text {
+      margin: 4px 0 10px;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .option-btn {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-main);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--fast), transform var(--fast),
+        box-shadow var(--fast), border-color var(--fast);
+    }
+
+    .option-btn-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 3px;
+    }
+
+    .option-btn:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(74, 85, 104, 0.12);
+      border-color: rgba(74, 85, 104, 0.3);
+    }
+
+    .option-btn.selected {
+      background: linear-gradient(120deg, #F7FAFC, #EDF2F7);
+      border-color: var(--accent-soft);
+      box-shadow: 0 12px 26px rgba(74, 85, 104, 0.18);
+    }
+
+    .option-btn::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0),
+        var(--accent-soft),
+        rgba(255, 255, 255, 0)
+      );
+      opacity: 0;
+      transition: opacity 0.2s ease, height 0.2s ease;
+    }
+
+    .option-btn.selected::after {
+      opacity: 1;
+      height: 0;
+    }
+
+    .quiz-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      gap: 8px;
+    }
+
+    .quiz-footer-right { display: flex; gap: 8px; }
+
+    /* 結果頁 */
+
+    #result-screen {
+      margin-top: 14px;
+      margin-bottom: 12px;
+    }
+
+    .result-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .result-main-left-label {
+      font-size: calc(12px * var(--result-text-scale));
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .result-type-name {
+      font-size: calc(18px * var(--result-text-scale));
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .result-tags {
+      font-size: calc(12px * var(--result-text-scale));
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .result-radar {
+      font-size: calc(12px * var(--result-text-scale));
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .result-job {
+      font-size: calc(13px * var(--result-text-scale));
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .result-power {
+      font-size: calc(13px * var(--result-text-scale));
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    .result-main-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-main-visual {
+      width: 220px;
+      height: 240px;
+      border-radius: 40px;
+      background: radial-gradient(circle at 0 0, #718096, #4A5568);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(45, 55, 72, 0.25);
+    }
+
+    .result-main-visual img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .result-main-caption {
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: center;
+    }
+
+    .result-main-caption span {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .result-extra-section {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .result-group-title {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .result-mini-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .result-mini-card {
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 8px 9px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .result-mini-visual {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #F7FAFC, #EDF2F7);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-mini-visual img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .result-mini-label {
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .result-mini-type {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .result-mini-tags {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .result-mini-power {
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .result-rival-note {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.4;
+    }
+
+    .result-actions {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .result-actions .btn-secondary {
+      font-size: 11px;
+      padding-inline: 18px;
+    }
+
+    /* 載入動畫 */
+
+    .preloader {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 0 0, #F7FAFC 0, #EDF2F7 20%, #E2E8F0 50%, #CBD5E0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 99;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .preloader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-bot {
+      width: 82px;
+      height: 82px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #ffffff, #F7FAFC);
+      box-shadow: 0 16px 30px rgba(74, 85, 104, 0.25);
+      position: relative;
+      overflow: hidden;
+      animation: floaty 1.4s ease-in-out infinite;
+    }
+
+    .loader-bot-face {
+      position: absolute;
+      inset: 14px 12px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #F7FAFC, #ffffff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .loader-eye {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #333;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader-eye::after {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #fff;
+      top: 1px;
+      left: 2px;
+      opacity: 0.8;
+    }
+
+    .loader-mouth {
+      width: 20px;
+      height: 10px;
+      border-radius: 40px;
+      border: 2px solid #333;
+      border-top: none;
+      margin-top: 4px;
+    }
+
+    .loader-sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--accent-soft);
+      border-radius: 2px;
+      transform: rotate(45deg);
+      opacity: 0.7;
+      animation: sparkle 1.6s ease-in-out infinite alternate;
+    }
+
+    .loader-sparkle:nth-child(2) {
+      top: 10px;
+      left: 6px;
+    }
+
+    .loader-sparkle:nth-child(3) {
+      bottom: 8px;
+      right: 10px;
+      animation-delay: 0.25s;
+    }
+
+    @keyframes floaty {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes sparkle {
+      0% {
+        transform: translateY(0) rotate(45deg) scale(1);
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-4px) rotate(45deg) scale(1.25);
+        opacity: 1;
+      }
+    }
+
+    .preloader-text {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    /* 畫面彈出 */
+
+    .screen-pop {
+      animation: screenPop 0.45s ease;
+    }
+
+    @keyframes screenPop {
+      0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* 小提醒泡泡 */
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(45, 55, 72, 0.9);
+      color: #fff;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 40;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -4px);
+    }
+
+    /* RWD */
+
+    @media (max-width: 720px) {
+      main.app { padding: 10px; }
+      .card { padding: 14px 12px 16px; border-radius: 18px; }
+      .intro-layout { grid-template-columns: 1fr; }
+      .intro-side { order: -1; }
+      .result-main { grid-template-columns: 1fr; }
+      .result-extra-section { grid-template-columns: 1fr; }
+      .result-mini-list { grid-template-columns: 1fr; }
+      .result-main-visual { width: 180px; height: 200px; }
+      .quiz-question-text { font-size: 16px; }
+
+      /* 小螢幕就不要放大，維持原比例 */
+      #result-main-left {
+        --result-text-scale: 1 !important;
+      }
+    }
+
+    /* 背景層 */
+
+    .forest-bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.7) 0, transparent 55%),
+                  radial-gradient(circle at 80% 100%, rgba(237, 242, 247, 0.9) 0, transparent 55%);
+      pointer-events: none;
+    }
+
+    .forest-orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(2px);
+      opacity: 0.9;
+      animation: orbFloat 16s ease-in-out infinite alternate;
+    }
+
+    .forest-orb.orb-1 {
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, #CBD5E0 0, rgba(203, 213, 224, 0) 60%);
+      top: -80px;
+      left: -60px;
+    }
+
+    .forest-orb.orb-2 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, #E2E8F0 0, rgba(226, 232, 240, 0) 60%);
+      bottom: -120px;
+      right: -40px;
+      animation-delay: 3s;
+    }
+
+    .forest-orb.orb-3 {
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, #A0AEC0 0, rgba(160, 174, 192, 0) 60%);
+      top: 45%;
+      left: 60%;
+      animation-delay: 6s;
+    }
+
+    @keyframes orbFloat {
+      0%   { transform: translate3d(0, 0, 0) scale(1); }
+      50%  { transform: translate3d(10px, -18px, 0) scale(1.03); }
+      100% { transform: translate3d(-12px, 10px, 0) scale(1.02); }
+    }
+
+    .forest-firefly {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #E2E8F0;
+      box-shadow: 0 0 10px rgba(226, 232, 240, 0.9);
+      opacity: 0.8;
+      animation: firefly 14s linear infinite;
+    }
+
+    .forest-firefly.f1 { top: 18%; left: 12%; animation-duration: 12s; }
+    .forest-firefly.f2 { top: 32%; right: 15%; animation-duration: 16s; }
+    .forest-firefly.f3 { bottom: 20%; left: 28%; animation-duration: 18s; }
+    .forest-firefly.f4 { bottom: 8%; right: 30%; animation-duration: 20s; }
+
+    @keyframes firefly {
+      0% {
+        transform: translate3d(0, 0, 0);
+        opacity: 0.2;
+      }
+      25% {
+        transform: translate3d(20px, -10px, 0);
+        opacity: 1;
+      }
+      50% {
+        transform: translate3d(40px, 0, 0);
+        opacity: 0.4;
+      }
+      75% {
+        transform: translate3d(10px, 20px, 0);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translate3d(-10px, -10px, 0);
+        opacity: 0.3;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- 開啟首頁 -->
+  <div id="preloader" class="preloader">
+    <div class="forest-bg-layer">
+      <div class="forest-orb orb-1"></div>
+      <div class="forest-orb orb-2"></div>
+      <div class="forest-orb orb-3"></div>
+
+      <div class="forest-firefly f1"></div>
+      <div class="forest-firefly f2"></div>
+      <div class="forest-firefly f3"></div>
+      <div class="forest-firefly f4"></div>
+    </div>
+    <div class="preloader-text">特務天賦同步中…</div>
+  </div>
+
+  <main class="app hidden" id="app-root">
+    <header class="app-header">
+      <div class="app-badge">AGENT VILLAGE • MY STYLE TEST</div>
+      <h1 class="app-title">特務天賦鑑定</h1>
+      <p class="app-subtitle">你在特務村裡的職業是什麼呢？</p>
+    </header>
+
+    <!-- 介紹 -->
+    <section id="intro-screen" class="card screen-pop">
+      <div class="intro-layout">
+        <div class="intro-main-text">
+          <h2>進村報到前，先決定你是哪一型特務吧！</h2>
+          <p>你是新到村中報到的特務，身為新手的你，對於要做什麼職業感到迷茫。</p>
+          <p>村長給你準備了一套心理測驗題目，來測測看在村中最適合你的職業吧！</p>
+          <p>測驗結束後你會看到：</p>
+          <ul style="margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--text-sub);">
+            <li>最符合你的特務角色</li>
+            <li>與你答案角色最接近的「最佳拍檔」</li>
+            <li>與你工作風格最不同的「鏡像夥伴」</li>
+          </ul>
+          <div class="intro-tags">
+            <div class="intro-tag-pill"># 情境題心理測驗</div>
+            <div class="intro-tag-pill"># 本測驗僅供參考娛樂</div>
+            <div class="intro-tag-pill"># 在職場上發光發熱吧</div>
+          </div>
+          <div class="intro-mini-note">本測驗沒有標準答案，不論什麼職業重點是你要喜歡它。</div>
+          <div class="intro-button-row">
+            <button id="start-btn" class="btn-primary">
+              開始測驗 <span>▶</span>
+            </button>
+            <button id="skip-intro-btn" class="btn-secondary">
+              直接跳到第一題
+            </button>
+          </div>
+        </div>
+        <div class="intro-side">
+          <div class="avatar-placeholder" id="random-avatar-placeholder">
+          </div>
+          <div class="avatar-caption" id="random-avatar-caption">
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 題目 -->
+    <section id="quiz-screen" class="hidden">
+      <div class="card quiz-card">
+        <div>
+          <div class="quiz-progress-row">
+            <div class="quiz-progress-bar">
+              <div id="progress-fill" class="quiz-progress-bar-fill"></div>
+            </div>
+            <div id="progress-text" class="quiz-progress-text">0 / 0</div>
+          </div>
+          <div class="quiz-question-title" id="question-label">QUESTION</div>
+          <div class="quiz-question-text" id="question-text"></div>
+          <div class="quiz-options" id="options-container"></div>
+        </div>
+        <div class="quiz-footer">
+          <button id="prev-btn" class="btn-secondary">◀ 上一題</button>
+          <div class="quiz-footer-right">
+            <button id="next-btn" class="btn-primary">下一題 ▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 結果 -->
+    <section id="result-screen" class="hidden">
+      <div class="card screen-pop">
+        <div class="result-main">
+          <!-- 新增 id，供自動縮放使用 -->
+          <div id="result-main-left">
+            <div class="result-main-left-label">YOUR AGENT TYPE</div>
+            <div class="result-type-name" id="result-main-name">命定特務角色名稱</div>
+            <div class="result-tags" id="result-main-tags"></div>
+            <div class="result-radar" id="result-main-radar"></div>
+            <div class="result-job" id="result-main-job"></div>
+            <div class="result-power" id="result-main-power"></div>
+          </div>
+          <div class="result-main-right">
+            <div class="result-main-visual">
+              <img id="result-main-image" src="" alt="特務角色圖片" />
+            </div>
+            <div class="result-main-caption">
+              <span id="result-caption-text"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-extra-section">
+          <div>
+            <div class="result-group-title">
+              最佳拍檔 BEST MATCH
+            </div>
+            <div class="result-mini-list">
+              <div class="result-mini-card" id="best-card">
+                <div class="result-mini-visual">
+                  <img id="best-image" src="" alt="" />
+                </div>
+                <div class="result-mini-label mini-label">Best Match</div>
+                <div class="result-mini-type mini-type">--</div>
+                <div class="result-mini-tags mini-tags">--</div>
+                <div class="result-mini-power mini-power">--</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="result-group-title">鏡像夥伴 RIVAL</div>
+            <div class="result-mini-list">
+              <div class="result-mini-card" id="rival-card">
+                <div class="result-mini-visual">
+                  <img id="rival-image" src="" alt="" />
+                </div>
+                <div class="result-mini-label">Rival</div>
+                <div class="result-mini-type" id="rival-type">--</div>
+                <div class="result-mini-tags" id="rival-tags">--</div>
+                <div class="result-mini-power" id="rival-power">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button id="restart-btn" class="btn-secondary">再玩一次</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">請先選一個選項喔！</div>
+
+  <script>
+    /* ===== TRAIT / PAIR DATA 同前（略，直接沿用你現在這一份） ===== */
+    const TRAIT_DATA = {
+      AUD: {
+        code: "AUD",
+        name: "精準大法官(貓頭鷹)",
+        tags: "#細節控 #誠信之眼 #零失誤",
+        radar: "強化「細節查核力」",
+        job: "資安稽核 (Auditor)",
+        power: "確保所有作業符合標準規範，不放過任何微小誤差或合規風險。",
+        image: "img/cat.png",
+        bestMatch: "GOV",
+        rival: "RED"
+      },
+      GOV: {
+        code: "GOV",
+        name: "戰略指揮官(獅子)",
+        tags: "#大局觀專家 #策略之腦 #風險預言",
+        radar: "強化「策略佈局力」",
+        job: "資安治理 (Governance / GRC)",
+        power: "制定組織整體的資安策略與規章，預測並管理長遠風險。",
+        image: "img/bigcat.png",
+        bestMatch: "AUD",
+        rival: "GRY"
+      },
+      RED: {
+        code: "RED",
+        name: "數位破壁者(浣熊)",
+        tags: "#創意鬼才 #不按牌理 #突破者",
+        radar: "強化「創造突破力」",
+        job: "紅隊演練 / 滲透測試 (Red Team)",
+        power: "模擬黑客思維，尋找系統中沒人發現的漏洞與非正規的突破口。",
+        image: "img/kuma.png",
+        bestMatch: "BLK",
+        rival: "BLU"
+      },
+      BLU: {
+        code: "BLU",
+        name: "終極守護神(北極熊)",
+        tags: "#穩重如山 #冷靜防禦 #安全區",
+        radar: "強化「防禦守護力」",
+        job: "藍隊防禦 / 安全運維 (Blue Team)",
+        power: "建立堅實的防禦堡壘，即時監控並擋下外來威脅，維護系統安全穩定。",
+        image: "img/bear.png",
+        bestMatch: "WHT",
+        rival: "RED"
+      },
+      WHT: {
+        code: "WHT",
+        name: "正義實踐者(海豚)",
+        tags: "#道德標竿 #熱血導師 #善良",
+        radar: "強化「團隊合作力」",
+        job: "白帽駭客 / 安全顧問 (White Hat)",
+        power: "運用高超技術協助他人解決安全問題，重視道德、教育與正面影響力。",
+        image: "img/dofi.png",
+        bestMatch: "BLU",
+        rival: "BLK"
+      },
+      GRY: {
+        code: "GRY",
+        name: "極簡務實者(狐狸)",
+        tags: "#效率至上 #靈活切換 #實戰派",
+        radar: "強化「務實行動力」",
+        job: "灰帽駭客 / 實戰派工程師",
+        power: "效率至上，不被教條束縛，在黑白之間選擇最彈性的解決路徑。",
+        image: "img/fox.png",
+        bestMatch: "GRN",
+        rival: "GOV"
+      },
+      GRN: {
+        code: "GRN",
+        name: "潛力之星(松鼠)",
+        tags: "#好奇寶寶 #學習超速 #無限可能",
+        radar: "強化「好奇學習力」",
+        job: "新手學習者 / 未來人才 (Green Hat)",
+        power: "具備極強的好奇心與吸收力，雖然還在成長，但擁有跨領域發展的無限潛力。",
+        image: "img/smallrat.png",
+        bestMatch: "GRY",
+        rival: "AUD"
+      },
+      BLK: {
+        code: "BLK",
+        name: "隱形觀察家(黑豹)",
+        tags: "#直覺敏銳 #深藏不露 #暗影",
+        radar: "強化「獨立觀察力」",
+        job: "威脅情報分析 (Cyber Intelligence)",
+        power: "冷靜且直覺敏銳，擅長在暗影中觀察敵情、分析趨勢，深藏不露地掌握真相。",
+        image: "img/blackcat.png",
+        bestMatch: "RED",
+        rival: "WHT"
+      }
+    };
+
+    const TRAIT_CODES = Object.keys(TRAIT_DATA);
+
+    const PAIR_DATA = {
+      BLUGRN: { codes: ["BLU", "GRN"], name: "鐵壁新人犰狳", image: "img/BLUGRN.png" },
+      GRNWHT: { codes: ["GRN", "WHT"], name: "天選之子中國龍", image: "img/GRNWHT.png" },
+      REDGRY: { codes: ["RED", "GRY"], name: "暗影忍者變色龍", image: "img/REDGRY.png" },
+      AUDWHT: { codes: ["AUD", "WHT"], name: "合規監察長天秤麒麟", image: "img/AUDWHT.png" },
+      GOVWHT: { codes: ["GOV", "WHT"], name: "資安大導師抹香鯨", image: "img/GOVWHT.png" },
+      GOVRED: { codes: ["GOV", "RED"], name: "戰略謀士蛇鷹", image: "img/GOVRED.png" },
+      REDBLU: { codes: ["RED", "BLU"], name: "紫隊傳奇狼", image: "img/REDBLU.png" },
+      AUDBLU: { codes: ["AUD", "BLU"], name: "數位法醫蜜獾", image: "img/AUDBLU.png" },
+      AUDBLK: { codes: ["AUD", "BLK"], name: "沈默判官烏鴉", image: "img/AUDBLK.png" },
+      GOVBLU: { codes: ["GOV", "BLU"], name: "數位總管螳螂獅", image: "img/GOVBLU.png" },
+      AUDGOV: { codes: ["AUD", "GOV"], name: "神級特務官CISO獅鷹", image: "img/AUDGOV.png" },
+      BLKGRY: { codes: ["BLK", "GRY"], name: "隱形幽靈幽靈", image: "img/BLKGRY.png" }
+    };
+    // 稀有角色完整屬性（從「稀有角色屬性」sheet 轉過來）
+    const RARE_ROLES = {
+      AUDGOV: {
+        rare: true,
+        code: "AUDGOV",
+        codePair: "AUD + GOV",
+        name: "【神級特務官 CISO】獅鳩",
+        tags: "#全局裁決者 #理性與勇氣 #終極責任",
+        radar: "強化「最高決策統御力」",
+        job: "資安長 / 組織最高資安負責人（CISO）",
+        power:
+          "結合GOV的領導威嚴與AUD的冷靜理性，能在壓力與混亂中做出最正確的裁決。負責統整稽核、治理與防禦體系，是整個組織資安的最終守門人。",
+        image: "img/AUDGOV.png",
+        bestMatch: "REDBLU",
+        rival: "BLKGRY"
+      },
+      REDBLU: {
+        rare: true,
+        code: "REDBLU",
+        codePair: "RED + BLU",
+        name: "【紫隊傳奇】狼",
+        tags: "#攻防一體 #精準反擊 #平衡者",
+        radar: "強化「攻防整合力」",
+        job: "紫隊協作 / 攻防整合專家（Purple Team）",
+        power:
+          "同時理解進攻者的破壞邏輯與防禦者的保護思維，擅長在關鍵時刻給出致命反擊。像狼般耐心潛伏，只在最佳時機出手。",
+        image: "img/REDBLU.png",
+        bestMatch: "AUDGOV",
+        rival: "GRNWHT"
+      },
+      AUDBLU: {
+        rare: true,
+        code: "AUDBLU",
+        codePair: "AUD + BLU",
+        name: "【數位法醫】蜜獾",
+        tags: "#真相獵人 #不死心 #死追到底",
+        radar: "強化「事件追查力」",
+        job: "數位鑑識 / 資安事件調查（Digital Forensics）",
+        power:
+          "面對再複雜的事件也不退縮，能深入系統底層還原真相。像蜜獾一樣頑強，任何被隱藏的痕跡都逃不過他的追查。",
+        image: "img/AUDBLU.png",
+        bestMatch: "AUDBLK",
+        rival: "GOVRED"
+      },
+      GOVRED: {
+        rare: true,
+        code: "GOVRED",
+        codePair: "GOV + RED",
+        name: "【戰略謀士】蛇鷹",
+        tags: "#高空視角 #致命判斷 #風險操盤",
+        radar: "強化「戰略預判力」",
+        job: "資安策略規劃 / 紅隊戰術設計",
+        power:
+          "從全局俯瞰整個戰場，精準鎖定最關鍵的攻擊與防守節點。不追求華麗操作，只追求一擊致勝的策略價值。",
+        image: "img/GOVRED.png",
+        bestMatch: "GOVBLU",
+        rival: "AUDBLU"
+      },
+      GOVWHT: {
+        rare: true,
+        code: "GOVWHT",
+        codePair: "GOV + WHT",
+        name: "【資安大導師】抹香鯨",
+        tags: "#深度智慧 #長期守護 #知識承載",
+        radar: "強化「制度傳承力」",
+        job: "資安顧問 / 教育訓練導師",
+        power:
+          "擁有深不可測的知識深度與耐心，能為組織建立長期穩定的資安文化。像抹香鯨般承載大量經驗，默默支撐整個系統生態。",
+        image: "img/GOVWHT.png",
+        bestMatch: "AUDWHT",
+        rival: "REDGRY"
+      },
+      AUDWHT: {
+        rare: true,
+        code: "AUDWHT",
+        codePair: "AUD + WHT",
+        name: "【合規監察長】天秤麒麟",
+        tags: "#公平裁決 #規範守門 #零偏差",
+        radar: "強化「合規平衡力」",
+        job: "合規管理 / 稽核顧問 / 法規遵循（Compliance & Audit）",
+        power:
+          "以天秤為象徵，代表絕對的公平與精準衡量。合規監察長擅長在法規、標準與實務之間取得平衡，確保每一項制度、流程與操作都符合規範精神，而非流於形式。不追求速度，而追求正確；不偏袒任何一方，只忠於事實與標準，是組織中最可靠的規範守門者。",
+        image: "img/AUDWHT.png",
+        bestMatch: "GOVWHT",
+        rival: "BLUGRN"
+      },
+      REDGRY: {
+        rare: true,
+        code: "REDGRY",
+        codePair: "RED + GRY",
+        name: "【暗影忍者】變色龍",
+        tags: "#潛行高手 #環境適應 #無聲滲透",
+        radar: "強化「隱匿行動力」",
+        job: "低調攻防 / 實戰型安全專家",
+        power:
+          "能快速融入環境、不留痕跡地完成任務。不追求名聲，只在關鍵時刻改變戰局，是最難被察覺的行動派。",
+        image: "img/REDGRY.png",
+        bestMatch: "BLKGRY",
+        rival: "GOVWHT"
+      },
+      GRNWHT: {
+        rare: true,
+        code: "GRNWHT",
+        codePair: "GRN + WHT",
+        name: "【天選之子】中國龍",
+        tags: "#天賦覺醒 #使命感 #未來核心",
+        radar: "強化「跨域成長力」",
+        job: "新世代資安人才 / 潛力領導者",
+        power:
+          "結合學習力與道德感的稀有存在，被視為未來資安世界的關鍵角色。尚在成長，但已展現出足以改變局勢的潛能。",
+        image: "img/GRNWHT.png",
+        bestMatch: "BLUGRN",
+        rival: "REDBLU"
+      },
+      BLUGRN: {
+        rare: true,
+        code: "BLUGRN",
+        codePair: "BLU + GRN",
+        name: "【鐵壁新人】犰狳",
+        tags: "#防禦本能 #快速成長 #越挫越硬",
+        radar: "強化「防禦基礎力」",
+        job: "資安新手 / 防禦體系培養中",
+        power:
+          "雖然仍在學習階段，但已具備極強的防禦本能。隨著經驗累積，會成為組織中最可靠的防線之一。",
+        image: "img/BLUGRN.png",
+        bestMatch: "GRNWHT",
+        rival: "AUDWHT"
+      },
+      BLKGRY: {
+        rare: true,
+        code: "BLKGRY",
+        codePair: "BLK + GRY",
+        name: "【隱形幽靈】幽靈",
+        tags: "#無形存在 #資訊滲透 #真相旁觀者",
+        radar: "強化「情報滲透力」",
+        job: "隱密行動 / 非典型情報角色",
+        power:
+          "不留下足跡、不被記錄，卻對整個局勢瞭若指掌。像幽靈般穿梭在系統與資訊之間，掌握最真實的暗流。",
+        image: "img/BLKGRY.png",
+        bestMatch: "REDGRY",
+        rival: "AUDGOV"
+      },
+      GOVBLU: {
+        rare: true,
+        code: "GOVBLU",
+        codePair: "GOV + BLU",
+        name: "【數位總管】蟻蛉（螞蟻獅）",
+        tags: "#系統架構師 #流程陷阱 #秩序守護",
+        radar: "強化「系統治理力」",
+        job: "資安管理 / SOC 與制度整合",
+        power:
+          "擅長設計流程與制度本身作為防禦手段，讓威脅在進入核心前就被困住。不是第一線戰鬥者，卻是戰局的設計者。",
+        image: "img/GOVBLU.png",
+        bestMatch: "GOVRED",
+        rival: "AUDBLK"
+      },
+      AUDBLK: {
+        rare: true,
+        code: "AUDBLK",
+        codePair: "AUD + BLK",
+        name: "【沈默判官】獨角獸",
+        tags: "#最終裁決 #冷靜旁觀 #結案者",
+        radar: "強化「風險裁決力」",
+        job: "高階稽核 / 風險評估與裁定",
+        power:
+          "不參與混戰，只在一切塵埃落定後出現。負責判斷哪些風險該被保留、消除或承擔，是組織最後的判斷之眼。",
+        image: "img/AUDBLK.png",
+        bestMatch: "AUDBLU",
+        rival: "GOVBLU"
+      }
+    };
+
+    // 依 Top1 + Top2 找對應的稀有角色（順序無關）
+    function getRareFromTopTwo(code1, code2) {
+      const key1 = code1 + code2;
+      const key2 = code2 + code1;
+      return RARE_ROLES[key1] || RARE_ROLES[key2] || null;
+    }
+
+    // 依「代號」找角色，可以是普通或稀有
+    function resolveRoleByCode(code) {
+      if (!code) return null;
+      if (RARE_ROLES[code]) return RARE_ROLES[code];
+      if (TRAIT_DATA[code]) return TRAIT_DATA[code];
+      return null;
+    }
+
+    function findPair(mainCode, otherCode) {
+      const key1 = mainCode + otherCode;
+      const key2 = otherCode + mainCode;
+      if (PAIR_DATA[key1]) return PAIR_DATA[key1];
+      if (PAIR_DATA[key2]) return PAIR_DATA[key2];
+      return null;
+    }
+
+    const QUESTIONS = [
+      /* 全部 8 題同前，略 */
+      {
+        id: "Q1",
+        text: "初次踏進神祕特務村，你最想先去哪種建築報到？",
+        options: [
+          { label: "A", text: "氣氛神祕、充滿古怪道具的雜貨店", scores: { RED: 2 } },
+          { label: "B", text: "守備森嚴、看起來超穩固的重裝基地", scores: { BLU: 2 } },
+          { label: "C", text: "堆滿歷史紀錄、分類精準的檔案室", scores: { AUD: 2 } },
+          { label: "D", text: "掌握全村動向、負責發號施令的中心", scores: { GOV: 2 } }
+        ]
+      },
+      {
+        id: "Q2",
+        text: "拿到證件後的第一個下午，你會如何展開探索？",
+        options: [
+          { label: "A", text: "主動找老村民聊天，挖掘闖關的隱藏撇步", scores: { GRN: 2 } },
+          { label: "B", text: "找個高處觀察全村地圖，掌握環境動線", scores: { BLK: 2 } },
+          { label: "C", text: "逐條核對村莊守則，確保自己不會出錯被扣分", scores: { AUD: 2 } },
+          { label: "D", text: "研究村莊的積分階級，規劃最快的升等路徑", scores: { GOV: 2 } }
+        ]
+      },
+      {
+        id: "Q3",
+        text: "面前出現了四條不同風格的路徑，你會走向哪一條？",
+        options: [
+          { label: "A", text: "雖然看起來很險峻，但從沒人走過的懸崖祕境", scores: { RED: 2 } },
+          { label: "B", text: "標示最清楚、看起來最符合標準官方建議的大路", scores: { AUD: 2 } },
+          { label: "C", text: "分析過路牌獎勵後，決定走勝率最高的戰略路線", scores: { GOV: 2 } },
+          { label: "D", text: "有防護盾裝置、能確保避開所有機關的安全地道", scores: { BLU: 2 } }
+        ]
+      },
+      {
+        id: "Q4",
+        text: "路邊發現一個貼著「禁止開啟」封條的神祕寶箱，你會？",
+        options: [
+          { label: "A", text: "翻找周邊線索，推理寶箱的開啟規律", scores: { WHT: 2 } },
+          { label: "B", text: "管他的，先動手嘗試各種暴力破解法", scores: { RED: 2 } },
+          { label: "C", text: "紀錄座標並上報給村長，避免意外發生", scores: { AUD: 2 } },
+          { label: "D", text: "躲在附近觀察，看是否有人會去開它", scores: { BLK: 2 } }
+        ]
+      },
+      {
+        id: "Q5",
+        text: "村莊大祭司要送你一件傳說裝備，你最想擁有哪一種？",
+        options: [
+          { label: "A", text: "能智慧統籌全局、預判危機的「指揮官權杖」", scores: { GOV: 2 } },
+          { label: "B", text: "能獲得眾人信任、建立強力連結的「守護者項鍊」", scores: { WHT: 2 } },
+          { label: "C", text: "能識破所有偽裝、照出真相的「真實之眼」眼鏡", scores: { AUD: 2 } },
+          { label: "D", text: "能適應任何極端環境、來去自如的「迷彩斗篷」", scores: { GRY: 2 } }
+        ]
+      },
+      {
+        id: "Q6",
+        text: "當你和其他特務陷入膠著的團體戰鬥時，你的反應是？",
+        options: [
+          { label: "A", text: "主動共享情報，讓隊友發揮最大戰力", scores: { GRN: 2 } },
+          { label: "B", text: "冷靜尋找對方的防禦漏洞，給予致命一擊", scores: { GRY: 2 } },
+          { label: "C", text: "加固自家防線，守住最後一道關卡不崩潰", scores: { BLU: 2 } },
+          { label: "D", text: "重新評估戰況，指揮隊員進退的時機", scores: { GOV: 2 } }
+        ]
+      },
+      {
+        id: "Q7",
+        text: "如果你可以獲得一種天生的超能力，你選哪一種？",
+        options: [
+          { label: "A", text: "【洞察】：一眼看出各項數據紀錄中是否有造假", scores: { AUD: 2 } },
+          { label: "B", text: "【閃瞬】：遇到危險時能以光速做出最有效的反應", scores: { GRY: 2 } },
+          { label: "C", text: "【變異】：能打破現有物理規則，創造全新的戰法", scores: { RED: 2 } },
+          { label: "D", text: "【鐵壁】：能替身後的隊友擋下所有不可預知的傷害", scores: { BLU: 2 } }
+        ]
+      },
+      {
+        id: "Q8",
+        text: "恭喜結訓！獲得證書後，你最希望夥伴怎麼稱讚你？",
+        options: [
+          { label: "A", text: "「你做事精確到跟齒輪一樣，從沒發生過誤差！」", scores: { AUD: 2 } },
+          { label: "B", text: "「你眼光真遠大，總能掌握未來的局勢發展！」", scores: { GOV: 2 } },
+          { label: "C", text: "「你真是個難以捉摸的神祕客，總能創造新花招！」", scores: { RED: 2 } },
+          { label: "D", text: "「你就像大山一樣穩重，有你在我們都很安心！」", scores: { BLU: 2 } }
+        ]
+      }
+    ];
+
+    /* ===== 狀態 & DOM ===== */
+    const state = {
+      currentIndex: 0,
+      answers: Array(QUESTIONS.length).fill(null),
+      scores: {}
+    };
+    TRAIT_CODES.forEach(c => state.scores[c] = 0);
+
+    const preloaderEl = document.getElementById("preloader");
+    const appRootEl = document.getElementById("app-root");
+
+    const introScreen = document.getElementById("intro-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+
+    const startBtn = document.getElementById("start-btn");
+    const skipIntroBtn = document.getElementById("skip-intro-btn");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const restartBtn = document.getElementById("restart-btn");
+
+    const progressFill = document.getElementById("progress-fill");
+    const progressText = document.getElementById("progress-text");
+    const questionLabel = document.getElementById("question-label");
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+
+    const resultMainName = document.getElementById("result-main-name");
+    const resultMainTags = document.getElementById("result-main-tags");
+    const resultMainJob = document.getElementById("result-main-job");
+    const resultMainRadar = document.getElementById("result-main-radar");
+    const resultMainPower = document.getElementById("result-main-power");
+    const resultMainImage = document.getElementById("result-main-image");
+    const resultCaptionText = document.getElementById("result-caption-text");
+    const resultMainLeft = document.getElementById("result-main-left");
+
+    const bestCard = document.getElementById("best-card");
+    const bestImage = document.getElementById("best-image");
+
+    const rivalImage = document.getElementById("rival-image");
+    const rivalType = document.getElementById("rival-type");
+    const rivalTags = document.getElementById("rival-tags");
+    const rivalPower = document.getElementById("rival-power");
+
+    const randomAvatarPlaceholder = document.getElementById("random-avatar-placeholder");
+    const randomAvatarCaption = document
+      .getElementById("random-avatar-caption")
+      .querySelector("span");
+
+    const toastEl = document.getElementById("toast");
+
+    function showToast(text) {
+      toastEl.textContent = text;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 1700);
+    }
+
+    function applyScores(qIndex, optIndex, factor) {
+      const opt = QUESTIONS[qIndex].options[optIndex];
+      if (!opt || !opt.scores) return;
+      Object.entries(opt.scores).forEach(([code, value]) => {
+        state.scores[code] += value * factor;
+      });
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[state.currentIndex];
+      if (!q) return;
+      const card = document.querySelector(".quiz-card");
+      card.classList.remove("fade-in", "fade-out");
+      card.classList.add("fade-out");
+
+      setTimeout(() => {
+        questionLabel.textContent = `QUESTION ${state.currentIndex + 1}`;
+        questionText.textContent = q.text;
+        optionsContainer.innerHTML = "";
+
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option-btn";
+          if (state.answers[state.currentIndex] === idx) btn.classList.add("selected");
+
+          const labelSpan = document.createElement("div");
+          labelSpan.className = "option-btn-label";
+          labelSpan.textContent = opt.label;
+
+          const textSpan = document.createElement("div");
+          textSpan.textContent = opt.text;
+
+          btn.appendChild(labelSpan);
+          btn.appendChild(textSpan);
+          btn.addEventListener("click", () => handleOptionClick(idx));
+          optionsContainer.appendChild(btn);
+        });
+
+        const total = QUESTIONS.length;
+        const current = state.currentIndex + 1;
+        progressFill.style.width = `${(current / total) * 100}%`;
+        progressText.textContent = `${current} / ${total}`;
+
+        prevBtn.disabled = state.currentIndex === 0;
+        nextBtn.textContent =
+          state.currentIndex === QUESTIONS.length - 1 ? "看結果 ▶" : "下一題 ▶";
+
+        card.classList.remove("fade-out");
+        card.classList.add("fade-in");
+      }, 180);
+    }
+
+    function handleOptionClick(optIndex) {
+      const qIndex = state.currentIndex;
+      const prev = state.answers[qIndex];
+
+      if (prev !== null && prev !== optIndex) applyScores(qIndex, prev, -1);
+      if (prev !== optIndex) {
+        state.answers[qIndex] = optIndex;
+        applyScores(qIndex, optIndex, 1);
+      }
+
+      const buttons = optionsContainer.querySelectorAll(".option-btn");
+      buttons.forEach((btn, idx) => btn.classList.toggle("selected", idx === optIndex));
+
+      setTimeout(() => {
+        if (state.currentIndex < QUESTIONS.length - 1) {
+          state.currentIndex += 1;
+          renderQuestion();
+        }
+      }, 220);
+    }
+
+    function prepareAndShowResult() {
+      showToast("測驗結果生成中...");
+      setTimeout(() => {
+        showResult();
+      }, 2000);
+    }
+
+    /* 自動放大左側文字，讓高度接近右側卡片 */
+    function autoScaleResultText() {
+      if (!resultMainLeft || window.innerWidth <= 720) {
+        // 小螢幕保持正常大小
+        resultMainLeft && resultMainLeft.style.setProperty("--result-text-scale", 1);
+        return;
+      }
+
+      // 先重置倍率
+      resultMainLeft.style.setProperty("--result-text-scale", 1);
+
+      const right = document.querySelector(".result-main-right");
+      if (!right) return;
+
+      const leftHeight = resultMainLeft.offsetHeight;
+      const rightHeight = right.offsetHeight;
+      if (!leftHeight || !rightHeight) return;
+
+      const ratio = rightHeight / leftHeight;
+      if (ratio > 1.05) {
+        const scale = Math.min(ratio * 0.9, 1.8); // 上限避免巨大
+        resultMainLeft.style.setProperty("--result-text-scale", scale);
+      }
+    }
+
+
+
+    function showResult() {
+      introScreen.classList.add("hidden");
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+
+      // 1. 先算出每個屬性的分數排序
+      const sorted = Object.entries(state.scores).sort((a, b) => b[1] - a[1]);
+
+      const [topCode, topScore] = sorted[0];
+      const [secondCode, secondScore] = sorted[1] || [];
+
+      // 2. 根據「Top1 & Top2 同分」判斷要不要啟用稀有角色
+      let mainRole = null;
+      let isRareMain = false;
+
+      if (
+        secondCode &&
+        topScore > 0 &&
+        secondScore > 0 &&
+        topScore === secondScore
+      ) {
+        const rare = getRareFromTopTwo(topCode, secondCode);
+        if (rare) {
+          mainRole = rare;
+          isRareMain = true;
+        }
+      }
+
+      // 如果沒有對應的稀有角色，就回到原本的單一屬性主角
+      if (!mainRole) {
+        mainRole = TRAIT_DATA[topCode];
+      }
+
+      // 3. 主角區塊顯示
+      if (mainRole) {
+        const displayName =
+          (mainRole.rare ? "稀有" : "") + (mainRole.name || "");
+
+        resultMainName.textContent = displayName;
+        resultMainTags.textContent = mainRole.tags || "";
+        resultMainRadar.textContent = mainRole.radar || "";
+        resultMainJob.textContent = mainRole.job || "";
+        resultMainPower.textContent = mainRole.power || "";
+
+        resultMainImage.src = mainRole.image || "";
+        resultMainImage.alt = mainRole.name || "";
+        resultCaptionText.textContent = mainRole.name || "";
+      }
+
+      // 4. 小卡片共用的填入函式（Best Match）
+      function fillMini(cardEl, imgEl, role, labelText) {
+        if (!cardEl) return;
+        const label = cardEl.querySelector(".mini-label");
+        const typeEl = cardEl.querySelector(".mini-type");
+        const tagsEl = cardEl.querySelector(".mini-tags");
+        const powerEl = cardEl.querySelector(".mini-power");
+
+        if (!role) {
+          cardEl.classList.add("hidden");
+          return;
+        }
+
+        cardEl.classList.remove("hidden");
+        if (label) label.textContent = labelText || "";
+
+        const codeText = role.codePair || role.code || "";
+        const nameText = role.name || "";
+
+        if (imgEl) {
+          imgEl.src = role.image || "";
+          imgEl.alt = nameText;
+        }
+
+        if (typeEl) typeEl.textContent = `${codeText} · ${nameText}`.trim();
+        if (tagsEl) tagsEl.textContent = role.tags || "";
+        if (powerEl) powerEl.textContent = role.power || "";
+      }
+
+      // 5. Best Match 邏輯
+      let bestRole = null;
+      if (mainRole && mainRole.bestMatch) {
+        bestRole = resolveRoleByCode(mainRole.bestMatch);
+      }
+      fillMini(bestCard, bestImage, bestRole, "Best Match");
+
+      // 6. Rival 邏輯（右下角那張）
+      let rivalRole = null;
+      if (mainRole && mainRole.rival) {
+        rivalRole = resolveRoleByCode(mainRole.rival);
+      }
+
+      // 如果沒設定 / 找不到，就退而求其次：拿分數最低的那一個普通屬性
+      if (!rivalRole) {
+        const [fallbackCode] = sorted[sorted.length - 1];
+        rivalRole = resolveRoleByCode(fallbackCode) || null;
+      }
+
+      if (rivalRole) {
+        const codeText = rivalRole.codePair || rivalRole.code || "";
+        const nameText = rivalRole.name || "";
+
+        rivalImage.src = rivalRole.image || "";
+        rivalImage.alt = nameText;
+        rivalType.textContent = `${codeText} · ${nameText}`.trim();
+        rivalTags.textContent = rivalRole.tags || "";
+        rivalPower.textContent = rivalRole.power || "";
+      }
+
+      // 7. 動畫 & 自動調整字體大小（維持原本效果）
+      resultScreen.classList.add("screen-pop");
+      setTimeout(() => resultScreen.classList.remove("screen-pop"), 450);
+
+      // 等 layout 完成後自動調整字體大小
+      setTimeout(autoScaleResultText, 60);
+    }
+
+
+    function resetTest() {
+      state.currentIndex = 0;
+      state.answers = Array(QUESTIONS.length).fill(null);
+      TRAIT_CODES.forEach(c => state.scores[c] = 0);
+
+      resultMainImage.src = "";
+      resultMainImage.alt = "";
+      resultCaptionText.textContent = "";
+      bestImage.src = "";
+      bestImage.alt = "";
+      rivalImage.src = "";
+      rivalImage.alt = "";
+      bestCard.classList.add("hidden");
+      resultMainName.textContent = "命定特務角色名稱";
+      resultMainTags.textContent = "";
+      resultMainRadar.textContent = "";
+      resultMainJob.textContent = "";
+      resultMainPower.textContent = "";
+      bestCard.querySelector(".mini-type").textContent = "--";
+      bestCard.querySelector(".mini-tags").textContent = "--";
+      bestCard.querySelector(".mini-power").textContent = "--";
+      rivalType.textContent = "--";
+      rivalTags.textContent = "--";
+      rivalPower.textContent = "--";
+
+      resultMainLeft.style.setProperty("--result-text-scale", 1);
+    }
+
+    function goToQuiz() {
+      introScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      renderQuestion();
+    }
+
+    function displayRandomRole() {
+      const randomIndex = Math.floor(Math.random() * TRAIT_CODES.length);
+      const randomCode = TRAIT_CODES[randomIndex];
+      const randomData = TRAIT_DATA[randomCode];
+
+      const img = document.createElement("img");
+      img.src = randomData.image;
+      img.alt = randomData.name;
+      randomAvatarPlaceholder.innerHTML = "";
+      randomAvatarPlaceholder.appendChild(img);
+
+      randomAvatarCaption.textContent = randomData.name;
+    }
+
+    window.addEventListener("load", () => {
+      displayRandomRole();
+      setTimeout(() => {
+        preloaderEl.classList.add("hide");
+        appRootEl.classList.remove("hidden");
+      }, 600);
+    });
+
+    startBtn.addEventListener("click", goToQuiz);
+    skipIntroBtn.addEventListener("click", goToQuiz);
+
+    prevBtn.addEventListener("click", () => {
+      if (state.currentIndex > 0) {
+        state.currentIndex -= 1;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (state.answers[state.currentIndex] == null) {
+        showToast("先選一個選項，再前進喔！");
+        return;
+      }
+      if (state.currentIndex === QUESTIONS.length - 1) {
+        if (state.answers.some(a => a === null)) {
+          showToast("還有沒選的題目，可以用上一題回去補選。");
+          return;
+        }
+        prepareAndShowResult();
+      } else {
+        state.currentIndex += 1;
+        renderQuestion();
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      resetTest();
+      goToQuiz();
+    });
+
+    // 視窗大小改變時，如果在結果頁就重新計算一次
+    window.addEventListener("resize", () => {
+      if (!resultScreen.classList.contains("hidden")) {
+        autoScaleResultText();
+      }
+    });
+  </script>
+</body>
+</html>
