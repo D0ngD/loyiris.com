@@ -90,6 +90,14 @@
       "common": true
     },
     {
+      "title": "html-decoder 解碼器",
+      "icon": "/img/html-decoder.png",
+      "url": "/tools/html-decoder.html",
+      "category": "編碼解碼工具",
+      "common": true,
+	  "created": "2026-01-19"
+    },
+    {
       "title": "隨機吃什麼",
       "icon": "/img/life-eat.png",
       "url": "/tools/eat-what.html",
