@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>HTML 解碼器｜Roy Dreambox</title>
+  <meta name="description" content="HTML 解碼器：將 &amp;lt;div&amp;gt;、&amp;amp;、&amp;quot; 等 HTML Entities 轉回原始文字。支援多次解碼、複製結果、手機與桌機自動適配。" />
+  <meta name="keywords" content="HTML 解碼, HTML Entities, &amp;lt;, &amp;gt;, &amp;amp;, Roy Dreambox" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="HTML 解碼器｜Roy Dreambox" />
+  <meta property="og:description" content="把 &amp;lt; &amp;gt; &amp;amp; 等 HTML Entities 解碼回正常文字，支援多次解碼與一鍵複製。" />
+  <meta property="og:image" content="/img/og-default.png" />
+  <meta property="og:type" content="website" />
+
+  <link rel="stylesheet" href="/global.css" />
+  <link rel="stylesheet" href="/css/loyui.css" />
+
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      font-family: "Noto Sans TC", "Inter", sans-serif;
+    }
+
+    .tool-title {
+      font-size: 26px;
+      margin: 6px 0 8px;
+      font-weight: 800;
+    }
+
+    .tool-desc {
+      margin: 0 0 14px;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+      margin-top: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .panel-head .label {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .panel-head .hint {
+      font-size: 12px;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    textarea.loy-input {
+      min-height: 320px;
+      resize: vertical;
+      line-height: 1.6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      justify-content: flex-end;
+    }
+
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mini-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: 13px;
+    }
+
+    .chip input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #666;
+      min-height: 18px;
+    }
+
+    .status.ok { color: #2f7a46; }
+    .status.warn { color: #8a5a00; }
+
+    /* 手機會吃到 loyui.css 的 @media 規則，
+       這裡只補一個保險： */
+    @media (max-width: 768px) {
+      .tool-layout { grid-template-columns: 1fr; }
+      textarea.loy-input { min-height: 220px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+  <script>
+    const categoryName = "編碼解碼工具";
+    const toolName = "HTML 解碼器";
+    loadHeader(categoryName, toolName);
+    document.title = `${toolName}｜Roy Toolbox`;
+  </script>
+
+  <main>
+    <h1 class="tool-title">HTML 解碼器</h1>
+    <p class="tool-desc">
+      把 HTML Entities（例如：<code>&amp;lt;</code>、<code>&amp;gt;</code>、<code>&amp;amp;</code>、<code>&amp;quot;</code>、<code>&amp;#x4E2D;</code>）解碼回原始文字。
+      支援「多次解碼」（遇到雙重編碼會很好用）。
+    </p>
+
+    <div class="loy-divider"></div>
+
+    <div class="tool-layout">
+      <!-- Left: Input -->
+      <section class="loy-card">
+        <div class="panel-head">
+          <div class="label">輸入（HTML Entities）</div>
+          <div class="hint">貼上要解碼的內容</div>
+        </div>
+
+        <textarea id="input" class="loy-input" placeholder="例如：&amp;lt;div class=&amp;quot;box&amp;quot;&amp;gt;Hello &amp;amp; Bye&amp;lt;/div&amp;gt;"></textarea>
+
+        <div class="mini-row">
+          <div class="mini-left">
+            <label class="chip" title="連續解碼次數（用於雙重或多重編碼）">
+              解碼次數
+              <input id="passes" type="number" min="1" max="20" value="1" />
+            </label>
+
+            <label class="chip" title="勾選後會嘗試『解碼到不再變化』，最多 20 次">
+              <input id="untilStable" type="checkbox" />
+              解到不變
+            </label>
+          </div>
+
+          <button class="tool-btn secondary" id="btnSample" type="button">塞一個範例</button>
+        </div>
+
+        <div class="action-row">
+          <button class="tool-btn secondary" id="btnClear" type="button">清空</button>
+          <button class="tool-btn" id="btnDecode" type="button">解碼</button>
+        </div>
+
+        <div id="status" class="status"></div>
+      </section>
+
+      <!-- Right: Output -->
+      <section class="loy-card">
+        <div class="panel-head">
+          <div class="label">輸出（解碼結果）</div>
+          <div class="hint">可直接複製</div>
+        </div>
+
+        <textarea id="output" class="loy-input" placeholder="解碼後會出現在這裡" readonly></textarea>
+
+        <div class="action-row">
+          <button class="tool-btn secondary" id="btnCopy" type="button">複製結果</button>
+        </div>
+
+        <div class="status" id="copyStatus"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 右下角全站按鈕 -->
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function decodeOnce(str) {
+      // 用 textarea 的解析能力做 entity decode（包含 &lt;、&#123;、&#x1F60A; 等）
+      const ta = document.createElement("textarea");
+      ta.innerHTML = str;
+      return ta.value;
+    }
+
+    function decodeHtmlEntities(input, opts) {
+      const maxPasses = 20;
+      let passes = Math.max(1, Math.min(maxPasses, Number(opts.passes || 1)));
+
+      if (opts.untilStable) passes = maxPasses;
+
+      let prev = input;
+      let cur = input;
+      let used = 0;
+
+      for (let i = 0; i < passes; i++) {
+        cur = decodeOnce(cur);
+        used++;
+
+        if (opts.untilStable && cur === prev) {
+          used--; // 最後一次沒變化，不算一次有效變更
+          break;
+        }
+        prev = cur;
+      }
+
+      return { value: cur, used };
+    }
+
+    function setStatus(msg, type = "") {
+      const el = $("status");
+      el.textContent = msg || "";
+      el.className = `status ${type}`.trim();
+    }
+
+    function setCopyStatus(msg, type = "") {
+      const el = $("copyStatus");
+      el.textContent = msg || "";
+      el.className = `status ${type}`.trim();
+    }
+
+    $("btnDecode").addEventListener("click", () => {
+      setCopyStatus("");
+      const input = $("input").value || "";
+      if (!input.trim()) {
+        $("output").value = "";
+        setStatus("請先貼上要解碼的內容。", "warn");
+        return;
+      }
+
+      const passes = $("passes").value;
+      const untilStable = $("untilStable").checked;
+
+      const { value, used } = decodeHtmlEntities(input, { passes, untilStable });
+      $("output").value = value;
+
+      if (untilStable) {
+        setStatus(`已嘗試解碼到不再變化（最多 20 次），實際有效變更：${used} 次。`, "ok");
+      } else {
+        setStatus(`已解碼：${Math.max(1, Number(passes || 1))} 次。`, "ok");
+      }
+    });
+
+    $("btnClear").addEventListener("click", () => {
+      $("input").value = "";
+      $("output").value = "";
+      setStatus("");
+      setCopyStatus("");
+      $("input").focus();
+    });
+
+    $("btnCopy").addEventListener("click", async () => {
+      const text = $("output").value || "";
+      if (!text) {
+        setCopyStatus("目前沒有可複製的內容。", "warn");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopyStatus("已複製到剪貼簿", "ok");
+      } catch (e) {
+        // fallback
+        $("output").focus();
+        $("output").select();
+        document.execCommand("copy");
+        setCopyStatus("已複製到剪貼簿", "ok");
+      }
+    });
+
+    $("btnSample").addEventListener("click", () => {
+      const sample = "&amp;lt;div class=&amp;quot;box&amp;quot;&amp;gt;Hello &amp;amp; 早安&amp;lt;/div&amp;gt;\\n\\n雙重編碼示例：&amp;amp;lt;span&amp;amp;gt;Iris&amp;amp;lt;/span&amp;amp;gt;";
+      $("input").value = sample;
+      $("passes").value = 1;
+      $("untilStable").checked = false;
+      $("output").value = "";
+      setStatus("已放入範例。若要解雙重編碼，勾「解到不變」或把解碼次數改成 2。", "");
+      $("input").focus();
+    });
+  </script>
+</body>
+</html>
