@@ -90,7 +90,7 @@
       "common": true
     },
     {
-      "title": "html-decoder 解碼器",
+      "title": "HTML 解碼器",
       "icon": "/img/html-decoder.png",
       "url": "/tools/html-decoder.html",
       "category": "編碼解碼工具",
