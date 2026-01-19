@@ -307,7 +307,9 @@
     });
 
     $("btnSample").addEventListener("click", () => {
-      const sample = "&amp;lt;div class=&amp;quot;box&amp;quot;&amp;gt;Hello &amp;amp; 早安&amp;lt;/div&amp;gt;\\n\\n雙重編碼示例：&amp;amp;lt;span&amp;amp;gt;Iris&amp;amp;lt;/span&amp;amp;gt;";
+      const sample = "&amp;lt;div class=&amp;quot;box&amp;quot;&amp;gt;Hello &amp;amp; 早安&amp;lt;/div&amp;gt;
+    
+    雙重編碼示例：&amp;amp;lt;span&amp;amp;gt;Iris&amp;amp;lt;/span&amp;amp;gt;";
       $("input").value = sample;
       $("passes").value = 1;
       $("untilStable").checked = false;
