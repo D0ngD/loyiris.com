@@ -83,6 +83,14 @@
 	  "created": "2025-12-29"
     },
     {
+      "title": "SHA512 雜湊產生器",
+      "icon": "/img/sha512.png",
+      "url": "/tools/sha512.html",
+      "category": "編碼解碼工具",
+      "common": true,
+	  "created": "2026-01-29"
+    },    
+    {
       "title": "Base64 解碼器/編碼器",
       "icon": "/img/base64.png",
       "url": "/tools/base64.html",
