@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331195744309280"
+     crossorigin="anonymous"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SHA512 雜湊產生器 | Roy Dreambox</title>
+  <meta name="description" content="SHA512 雜湊產生器：輸入文字即時產生 SHA-512 Hash（HEX），支援一鍵複製、清除、即時更新。免費免安裝，手機可用。">
+  <meta name="keywords" content="SHA512, SHA-512, hash, 雜湊, 產生器, checksum, Roy Dreambox">
+
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/css/loyui.css">
+  <script src="/js/loadHeader.js"></script>
+
+  <style>
+    .tool-title { font-size: 26px; margin: 10px 0 6px; }
+    .tool-desc { color: #666; margin: 0 0 14px; font-size: 14px; line-height: 1.6; }
+
+    .tool-layout{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 16px;
+      align-items: start;
+    }
+
+    .label-row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .label-row label{ font-weight: 700; }
+
+    .hint {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    textarea.loy-input {
+      min-height: 260px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .action-row{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #555;
+      min-height: 18px;
+    }
+
+    .pill {
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      font-size: 12px;
+      color: #444;
+      user-select: none;
+    }
+
+    .pill input { transform: translateY(1px); }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <script>
+    const categoryName = "編碼解碼工具";
+    const toolName = "SHA512 雜湊產生器";
+    loadHeader(categoryName, toolName);
+    document.title = `${toolName} | Roy Toolbox`;
+  </script>
+
+  <main>
+    <h1 class="tool-title">SHA512 雜湊產生器</h1>
+    <p class="tool-desc">
+      輸入任意文字，立即產生 SHA-512 雜湊（HEX）。適合做檔案/字串校驗、比對、記錄用指紋。
+      <br>小提醒：SHA-512 是雜湊不是加密，不能「解回原文」喔。
+    </p>
+
+    <div class="loy-divider"></div>
+
+    <div class="tool-layout">
+      <!-- LEFT -->
+      <section class="loy-card">
+        <div class="label-row">
+          <label for="inputText">輸入文字</label>
+          <span class="pill" title="輸入時自動更新雜湊">
+            <input id="autoUpdate" type="checkbox" checked>
+            <span>即時更新</span>
+          </span>
+        </div>
+
+        <textarea id="inputText" class="loy-input" placeholder="例如：hello world&#10;或貼上你要做雜湊的內容…"></textarea>
+
+        <div class="action-row">
+          <button class="tool-btn secondary" id="btnClear" type="button">清除</button>
+          <button class="tool-btn" id="btnHash" type="button">產生 SHA512</button>
+        </div>
+
+        <div class="hint">
+          會以 UTF-8 編碼計算雜湊。  
+          若你的瀏覽器不支援 Web Crypto（或非 HTTPS），會無法運作。
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <section class="loy-card">
+        <div class="label-row">
+          <label for="outputHash">SHA-512（HEX）</label>
+          <span class="pill" id="metaInfo">長度：0</span>
+        </div>
+
+        <textarea id="outputHash" class="loy-input" readonly placeholder="這裡會顯示雜湊結果"></textarea>
+
+        <div class="action-row">
+          <button class="tool-btn secondary" id="btnCopy" type="button">複製</button>
+        </div>
+
+        <div class="status" id="statusText"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 全站共用按鈕 -->
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const inputText = $("inputText");
+    const outputHash = $("outputHash");
+    const statusText = $("statusText");
+    const metaInfo = $("metaInfo");
+
+    function setStatus(msg, ok = true) {
+      statusText.textContent = msg || "";
+      statusText.style.color = ok ? "#555" : "#b00020";
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function sha512Hex(text) {
+      if (!window.crypto || !crypto.subtle) {
+        throw new Error("Web Crypto 不可用");
+      }
+      const enc = new TextEncoder();
+      const data = enc.encode(text);
+      const buf = await crypto.subtle.digest("SHA-512", data);
+      return bytesToHex(new Uint8Array(buf));
+    }
+
+    async function runHash() {
+      const text = inputText.value ?? "";
+      if (text.length === 0) {
+        outputHash.value = "";
+        metaInfo.textContent = "長度：0";
+        setStatus("（等待輸入）");
+        return;
+      }
+
+      try {
+        setStatus("計算中…");
+        const hex = await sha512Hex(text);
+        outputHash.value = hex;
+        metaInfo.textContent = `長度：${hex.length}`;
+        setStatus("完成 ✅");
+      } catch (e) {
+        outputHash.value = "";
+        metaInfo.textContent = "長度：0";
+        setStatus("產生失敗：請確認在 HTTPS 且瀏覽器支援 Web Crypto。", false);
+      }
+    }
+
+    $("btnHash").addEventListener("click", runHash);
+
+    $("btnClear").addEventListener("click", () => {
+      inputText.value = "";
+      outputHash.value = "";
+      metaInfo.textContent = "長度：0";
+      setStatus("已清除");
+      inputText.focus();
+    });
+
+    $("btnCopy").addEventListener("click", async () => {
+      const v = outputHash.value.trim();
+      if (!v) return setStatus("沒有可複製的內容", false);
+
+      try {
+        await navigator.clipboard.writeText(v);
+        setStatus("已複製到剪貼簿");
+      } catch {
+        outputHash.select();
+        document.execCommand("copy");
+        setStatus("已複製到剪貼簿");
+      }
+    });
+
+    $("autoUpdate").addEventListener("change", () => {
+      if ($("autoUpdate").checked) runHash();
+    });
+
+    inputText.addEventListener("input", () => {
+      if ($("autoUpdate").checked) runHash();
+    });
+
+    // 初始狀態
+    setStatus("（等待輸入）");
+  </script>
+</body>
+</html>
