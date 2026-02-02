@@ -126,6 +126,14 @@
       "category": "生活工具",
       "common": true,
 	  "created": "2025-12-23"
+	},
+	{
+      "title": "強密碼產生器",
+      "icon": "/img/password.png",
+      "url": "/tools/strong-password.html",
+      "category": "生活工具",
+      "common": true,
+	  "created": "2026-02-02"
     }  
   ],
 
