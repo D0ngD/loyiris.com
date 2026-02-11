@@ -1242,8 +1242,8 @@
     document.getElementById("btnResize").addEventListener("click", () => {
       const w = parseInt(document.getElementById("gridWidth").value, 10) || 24;
       const h = parseInt(document.getElementById("gridHeight").value, 10) || 24;
-      if (w < 5 || h < 5 || w > 80 || h > 80) {
-        alert("請輸入 5 ~ 80 之間的格數。");
+      if (w < 5 || h < 5 || w > 120 || h > 120) {
+        alert("請輸入 5 ~ 120 之間的格數。");
         return;
       }
       createEmptyGrid(w, h);
