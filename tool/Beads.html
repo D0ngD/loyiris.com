@@ -1132,7 +1132,7 @@
         alert("目前沒有圖可以匯出。");
         return;
       }
-
+      const patternName = document.getElementById("patternName").value.trim() || "Bead Pattern";
       const creator = document.getElementById("creatorName").value.trim() || "Unknown Artist";
 
       const exportCell = 32;
