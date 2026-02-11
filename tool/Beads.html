@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>拼豆圖紙產生器 2.0</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --main: #6599B3;         /* 霧藍青（跟 blog 接近） */
+      --text: #2a3135;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --border: #d5e1e8;
+      --hover: #86b3c7;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #e3edf5 0%, #f7f9fc 100%);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 320px;
+      padding: 16px 18px;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      backdrop-filter: blur(12px);
+    }
+
+    .right-sidebar {
+      width: 320px;
+      padding: 16px 18px;
+      background: var(--card-bg);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      backdrop-filter: blur(12px);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px;
+      gap: 8px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 8px;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 16px 0 8px;
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="file"],
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      background: #f7fafc;
+    }
+
+    button {
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      cursor: pointer;
+      margin-right: 6px;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.05s ease;
+    }
+
+    button.primary {
+      background: var(--main);
+      border-color: var(--main);
+      color: #fff;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--hover);
+      border-color: var(--hover);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+    }
+
+    .tool-button.active {
+      background: var(--main);
+      border-color: var(--main);
+      color: #fff;
+    }
+
+    .section {
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .palette.hide-codes .color-chip span {
+      display: none;
+    }
+
+    .color-chip {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.15);
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #000;
+      background-clip: padding-box;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .color-chip span {
+      background: rgba(255,255,255,0.7);
+      padding: 0 2px;
+      border-radius: 3px;
+    }
+
+    .color-chip.active {
+      outline: 2px solid var(--main);
+      outline-offset: 1px;
+      box-shadow: 0 0 0 2px rgba(101,153,179,0.35);
+    }
+
+    .color-chip.bucket-selected {
+      outline: 2px solid #f97373;
+      outline-offset: 1px;
+    }
+
+    .color-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .grid-wrapper {
+      flex: 1;
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      padding: 8px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    #gridCanvas {
+      image-rendering: pixelated;
+      cursor: crosshair;
+      display: block;
+      margin: auto;
+      background: #fdfdfd;
+    }
+
+    .stats {
+      font-size: 12px;
+    }
+
+    .stats table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+    }
+
+    .stats th,
+    .stats td {
+      border-bottom: 1px solid #eee;
+      padding: 2px 0;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .stats td.color-cell {
+      width: 20px;
+    }
+
+    .row-stats {
+      max-height: 140px;
+      overflow-y: auto;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      padding: 4px 6px;
+      background: #f9fbfd;
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #d8e7ef;
+      font-size: 11px;
+      margin-left: 4px;
+      color: #2a3135;
+    }
+
+    .mode-toggle button.active {
+      background: #222;
+      border-color: #222;
+      color: #fff;
+    }
+
+    .footer {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .right-sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h1>拼豆圖紙產生器</h1>
+    <div class="footer">做拼豆使我快樂	🧊</div>
+
+    <!-- 畫布設定 -->
+    <div class="section">
+      <h2>畫布 / 網格</h2>
+      <label>寬度（格數）</label>
+      <input type="number" id="gridWidth" min="5" max="120" value="30">
+      <label>高度（格數）</label>
+      <input type="number" id="gridHeight" min="5" max="120" value="30">
+      <button id="btnResize" class="primary">建立 / 重設畫布</button>
+    </div>
+
+    <!-- 圖片轉拼豆 -->
+    <div class="section">
+      <h2>圖片 → 拼豆圖</h2>
+      <label>選擇圖片</label>
+      <input type="file" id="imageInput" accept="image/*">
+      <label style="margin-top:6px;">最長邊（格數）</label>
+      <input type="number" id="maxSide" min="10" max="80" value="40">
+      <label style="margin-top:6px;">顏色數量（調小會簡化）</label>
+      <input type="number" id="colorCount" min="2" max="32" value="12">
+      <button id="btnConvert" class="primary" style="margin-top:6px;">轉成拼豆圖</button>
+      <div style="font-size:11px;color:#777;margin-top:4px;">
+        提示：最長邊越小、顏色數越少，圖會越簡化。
+      </div>
+    </div>
+
+    <!-- 統計 -->
+    <div class="section">
+      <h2>色號 / 數量統計</h2>
+      <div class="stats">
+        <table id="colorStatsTable">
+          <thead>
+          <tr><th>色號</th><th>顏色</th><th>顆數</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div style="margin-top:6px;font-size:12px;">每一列豆子數</div>
+      <div id="rowStats" class="row-stats"></div>
+    </div>
+
+    <!-- 匯出 -->
+    <div class="section">
+      <h2>匯出成品</h2>
+      <label>圖紙名稱</label>
+      <input type="text" id="patternName" placeholder="例如：Roy" value="Bead Pattern">
+      <label>創作者名稱</label>
+      <input type="text" id="creatorName" placeholder="例如：Roy" value="Roy">
+      <button id="btnExport" class="primary" style="margin-top:6px;">匯出 PNG 圖紙</button>
+      <div style="font-size:11px;color:#777;margin-top:4px;">
+        可將成果匯出分享。
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="toolbar">
+      <div class="mode-toggle">
+        <button id="modeGrid" class="active">圖紙模式（有色號）</button>
+        <button id="modePreview">預覽模式（只看圖）</button>
+      </div>
+
+      <!-- 工具列 -->
+      <button id="toolBrush" class="tool-button active">畫筆</button>
+      <button id="toolEyedropper" class="tool-button">吸管</button>
+      <button id="toolBucket" class="tool-button">選色桶</button>
+      <button id="toolLock" class="tool-button">鎖定</button>
+	  <button id="toolUnlockAll" class="tool-button">全部解鎖</button>
+
+      <button id="btnUndo" title="Ctrl+Z">↩</button>
+      <button id="btnRedo" title="Ctrl+Y">↪</button>
+
+      <span class="badge" id="infoSize">0 × 0</span>
+      <span class="badge" id="infoTotal">總豆數：0</span>
+      <span style="font-size:12px;color:#666;">
+        左鍵填色；Ctrl+Z 撤銷 / Ctrl+Y 重做；鎖定格子避免誤塗。
+      </span>
+    </div>
+
+    <div class="grid-wrapper">
+      <canvas id="gridCanvas"></canvas>
+    </div>
+  </div>
+
+  <div class="right-sidebar">
+    <!-- 調色盤 -->
+    <div class="section">
+      <h2>顏色盤（Artkal S 色票）</h2>
+      <button id="toggleCodes" class="primary" style="margin-bottom:6px;">隱藏色號</button>
+      <div id="palette" class="palette"></div>
+      <div style="margin-top:6px;font-size:12px;color:#666;">
+        ※ 目前使用 Artkal S 官方色票與色號，共 225 顏色。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 狀態 =====
+    const paletteConfig = [
+      { id: "S01", name: "White", hex: "#FFFFFF" },
+      { id: "S77", name: "Ghost White", hex: "#EFEFEF" },
+      { id: "S78", name: "Ash Gray", hex: "#D1D1D1" },
+      { id: "S79", name: "Light Gray / [Gray 1]", hex: "#BBBCBC" },
+      { id: "S07", name: "Gray / [Gray 2]", hex: "#9B9B9B" },
+      { id: "S43", name: "Dark Gray / [Gray 3]", hex: "#767777" },
+      { id: "S89", name: "Charcoal Gray / [Gray 4]", hex: "#484949" },
+      { id: "S69", name: "Mine Shaft", hex: "#23282B" },
+      { id: "S13", name: "Black", hex: "#000000" },
+      { id: "S42", name: "Silver", hex: "#A09F9D" },
+      { id: "S41", name: "Copper", hex: "#9A5516" },
+      { id: "S63", name: "Metallic Gold", hex: "#4C5914" },
+      { id: "S52", name: "Picasso", hex: "#F2F0A1" },
+      { id: "S29", name: "Pastel Yellow", hex: "#F6EB61" },
+      { id: "S14", name: "Sandstorm", hex: "#FAE053" },
+      { id: "S27", name: "Yellow", hex: "#FFD100" },
+      { id: "S48", name: "Corn", hex: "#FFC72C" },
+      { id: "S86", name: "Goldenrod", hex: "#EAAA00" },
+      { id: "S90", name: "Pastel orange", hex: "#FFC56E" },
+      { id: "S03", name: "Tangerine", hex: "#F6AD4C" },
+      { id: "S39", name: "Yellow Orange", hex: "#ED8B00" },
+      { id: "S56", name: "Bright Carrot", hex: "#FF6A13" },
+      { id: "S04", name: "Orange", hex: "#FF671F" },
+      { id: "S66", name: "Blaze Orange", hex: "#F4633A" },
+      { id: "S87", name: "Coral Red", hex: "#FF6D6A" },
+      { id: "S02", name: "Burning Sand", hex: "#FFA38B" },
+      { id: "S50", name: "Mandys Pink", hex: "#FAAA8D" },
+      { id: "S35", name: "Mona Lisa", hex: "#F7CED7" },
+      { id: "S28", name: "Lily Pink", hex: "#EAB8E4" },
+      { id: "S40", name: "Carnation Pink", hex: "#F1A7DC" },
+      { id: "S06", name: "Raspberry Pink", hex: "#EC86D0" },
+      { id: "S25", name: "Hot Pink", hex: "#FF34B3" },
+      { id: "S26", name: "Magenta", hex: "#DB2152" },
+      { id: "S05", name: "Tall Poppy", hex: "#E10600" },
+      { id: "S34", name: "Red", hex: "#BA0C2F" },
+      { id: "S58", name: "Paprika", hex: "#A50034" },
+      { id: "S38", name: "Burgundy", hex: "#AB2556" },
+      { id: "S49", name: "Mulberry Wood", hex: "#72195F" },
+      { id: "S88", name: "Dark Pink", hex: "#DA1884" },
+      { id: "S67", name: "Vanilla", hex: "#F3CFB3" },
+      { id: "S18", name: "Sand", hex: "#CC9966" },
+      { id: "S65", name: "Canary", hex: "#F3EA5D" },
+      { id: "S46", name: "Bright Green", hex: "#73D33C" },
+      { id: "S08", name: "Emerald", hex: "#24DE5B" },
+      { id: "S61", name: "Key Lemon Pie", hex: "#CEDC00" },
+      { id: "S70", name: "Dark Algae", hex: "#9BBC11" },
+      { id: "S80", name: "Dark Olive", hex: "#999B30" },
+      { id: "S55", name: "Pistachio", hex: "#ADDC91" },
+      { id: "S21", name: "Pastel Green", hex: "#87D839" },
+      { id: "S20", name: "Green", hex: "#249E6B" },
+      { id: "S71", name: "Jade Green", hex: "#00852B" },
+      { id: "S62", name: "Green Tea", hex: "#007C58" },
+      { id: "S09", name: "Dark Green", hex: "#00685E" },
+      { id: "S91", name: "Brunswick Green", hex: "#183028" },
+      { id: "S33", name: "Maverick", hex: "#C5B4E3" },
+      { id: "S60", name: "Lavender", hex: "#A77BCA" },
+      { id: "S12", name: "Pastel Lavender", hex: "#A05EB5" },
+      { id: "S23", name: "Royal Purple", hex: "#64359B" },
+      { id: "S59", name: "Butterfly Bush", hex: "#4A1F87" },
+      { id: "S22", name: "Purple", hex: "#330072" },
+      { id: "S64", name: "Black Rock", hex: "#050849" },
+      { id: "S44", name: "Sky Blue", hex: "#8DC8E8" },
+      { id: "S10", name: "Baby Blue", hex: "#41B6E6" },
+      { id: "S53", name: "Blue Enchantress", hex: "#69B3E7" },
+      { id: "S54", name: "Light Blue", hex: "#0090DA" },
+      { id: "S24", name: "True Blue", hex: "#147BD1" },
+      { id: "S11", name: "Dark Blue", hex: "#003399" },
+      { id: "S30", name: "Shadow Green", hex: "#99D6EA" },
+      { id: "S31", name: "Sea Mist", hex: "#9EE5B0" },
+      { id: "S37", name: "Blue-Green", hex: "#71D8BF" },
+      { id: "S72", name: "Light Sea Blue", hex: "#59D5D8" },
+      { id: "S45", name: "Medium Turquoise", hex: "#00B2A9" },
+      { id: "S76", name: "Sea Blue", hex: "#00AEC7" },
+      { id: "S73", name: "Steel Blue", hex: "#48A9C5" },
+      { id: "S74", name: "Azure", hex: "#00AED6" },
+      { id: "S75", name: "Dark Steel Blue", hex: "#0085AD" },
+      { id: "S84", name: "Deep Chestnut", hex: "#AA5761" },
+      { id: "S36", name: "Old Pink", hex: "#C9809E" },
+      { id: "S19", name: "Bubble Gum", hex: "#FCBFA9" },
+      { id: "S51", name: "Spring Sun", hex: "#FCFBCD" },
+      { id: "S32", name: "Beeswax", hex: "#FFE780" },
+      { id: "S68", name: "Tan", hex: "#E1C078" },
+      { id: "S81", name: "Deer", hex: "#CDB277" },
+      { id: "S82", name: "Clay", hex: "#B58150" },
+      { id: "S17", name: "Light Brown", hex: "#7B4D35" },
+      { id: "S16", name: "Brown", hex: "#5C4738" },
+      { id: "S85", name: "Red Wine", hex: "#42031A" },
+      { id: "S15", name: "Redwood", hex: "#793E2C" },
+      { id: "S57", name: "Buccaneer", hex: "#A4493D" },
+      { id: "S83", name: "Sienna", hex: "#B86125" },
+      { id: "S47", name: "Marigold", hex: "#B47E00" },
+      { id: "S92", name: "Dandelion", hex: "#DEB947" },
+      { id: "S93", name: "Pale Skin", hex: "#DAB698" },
+      { id: "S94", name: "Warm Blush", hex: "#F4A999" },
+      { id: "S95", name: "Salmon", hex: "#EE7D67" },
+      { id: "S96", name: "Apricot", hex: "#F08661" },
+      { id: "S97", name: "Papaya", hex: "#D4722A" },
+      { id: "S98", name: "Himalaya Blue", hex: "#64ACDF" },
+      { id: "S99", name: "Waterfall", hex: "#64C2DC" },
+      { id: "S100", name: "Lagoon", hex: "#279BBE" },
+      { id: "S101", name: "Clear White", hex: "#F8F8F8" },
+      { id: "S102", name: "Ivory", hex: "#FFFFF0" },
+      { id: "S103", name: "Light Yellow", hex: "#FFFFE0" },
+      { id: "S104", name: "Cream", hex: "#FFFDD0" },
+      { id: "S105", name: "Pale Yellow", hex: "#FFFACD" },
+      { id: "S106", name: "Lemon", hex: "#FFF700" },
+      { id: "S107", name: "Sunflower", hex: "#FFD700" },
+      { id: "S108", name: "Gold", hex: "#F4C430" },
+      { id: "S109", name: "Amber", hex: "#FFBF00" },
+      { id: "S110", name: "Mustard", hex: "#FFDB58" },
+      { id: "S111", name: "Butter", hex: "#FFE135" },
+      { id: "S112", name: "Banana", hex: "#FFE135" },
+      { id: "S113", name: "Daffodil", hex: "#FFFF31" },
+      { id: "S114", name: "Neon Yellow", hex: "#FFFF00" },
+      { id: "S115", name: "Chartreuse", hex: "#DFFF00" },
+      { id: "S116", name: "Lime", hex: "#BFFF00" },
+      { id: "S117", name: "Spring Green", hex: "#00FF7F" },
+      { id: "S118", name: "Mint", hex: "#98FB98" },
+      { id: "S119", name: "Seafoam", hex: "#90EE90" },
+      { id: "S120", name: "Apple Green", hex: "#8DB600" },
+      { id: "S121", name: "Kelly Green", hex: "#4CBB17" },
+      { id: "S122", name: "Forest Green", hex: "#228B22" },
+      { id: "S123", name: "Hunter Green", hex: "#355E3B" },
+      { id: "S124", name: "Olive Drab", hex: "#6B8E23" },
+      { id: "S125", name: "Avocado", hex: "#568203" },
+      { id: "S126", name: "Teal", hex: "#008080" },
+      { id: "S127", name: "Turquoise", hex: "#40E0D0" },
+      { id: "S128", name: "Aqua", hex: "#00FFFF" },
+      { id: "S129", name: "Cyan", hex: "#00FFFF" },
+      { id: "S130", name: "Powder Blue", hex: "#B0E0E6" },
+      { id: "S131", name: "Light Blue", hex: "#ADD8E6" },
+      { id: "S132", name: "Cornflower Blue", hex: "#6495ED" },
+      { id: "S133", name: "Royal Blue", hex: "#4169E1" },
+      { id: "S134", name: "Navy", hex: "#000080" },
+      { id: "S135", name: "Indigo", hex: "#4B0082" },
+      { id: "S136", name: "Violet", hex: "#EE82EE" },
+      { id: "S137", name: "Plum", hex: "#DDA0DD" },
+      { id: "S138", name: "Orchid", hex: "#DA70D6" },
+      { id: "S139", name: "Fuchsia", hex: "#FF00FF" },
+      { id: "S140", name: "Pink", hex: "#FFC0CB" },
+      { id: "S141", name: "Light Pink", hex: "#FFB6C1" },
+      { id: "S142", name: "Rose", hex: "#FF007F" },
+      { id: "S143", name: "Crimson", hex: "#DC143C" },
+      { id: "S144", name: "Scarlet", hex: "#FF2400" },
+      { id: "S145", name: "Tomato", hex: "#FF6347" },
+      { id: "S146", name: "Coral", hex: "#FF7F50" },
+      { id: "S147", name: "Salmon", hex: "#FA8072" },
+      { id: "S148", name: "Light Coral", hex: "#F08080" },
+      { id: "S149", name: "Dark Salmon", hex: "#E9967A" },
+      { id: "S150", name: "Peach", hex: "#FFE5B4" },
+      { id: "S151", name: "Beige", hex: "#F5F5DC" },
+      { id: "S152", name: "Khaki", hex: "#F0E68C" },
+      { id: "S153", name: "Tan", hex: "#D2B48C" },
+      { id: "S154", name: "Sienna", hex: "#A0522D" },
+      { id: "S155", name: "Chocolate", hex: "#D2691E" },
+      { id: "S156", name: "Peru", hex: "#CD853F" },
+      { id: "S157", name: "Saddle Brown", hex: "#8B4513" },
+      { id: "S158", name: "Maroon", hex: "#800000" },
+      { id: "S159", name: "Brick Red", hex: "#CB4154" },
+      { id: "S160", name: "Rust", hex: "#B7410E" },
+      { id: "S161", name: "Mahogany", hex: "#C04000" },
+      { id: "S162", name: "Taupe", hex: "#483C32" },
+      { id: "S163", name: "Sepia", hex: "#704214" },
+      { id: "S164", name: "Umber", hex: "#635147" },
+      { id: "S165", name: "Ochre", hex: "#CC7722" },
+      { id: "S166", name: "Burnt Sienna", hex: "#E97451" },
+      { id: "S167", name: "Terracotta", hex: "#E2725B" },
+      { id: "S168", name: "Vermilion", hex: "#E34234" },
+      { id: "S169", name: "Carmine", hex: "#960018" },
+      { id: "S170", name: "Wine", hex: "#722F37" },
+      { id: "S171", name: "Eggplant", hex: "#614051" },
+      { id: "S172", name: "Lavender Gray", hex: "#C4C3D0" },
+      { id: "S173", name: "Thistle", hex: "#D8BFD8" },
+      { id: "S174", name: "Mauve", hex: "#E0B0FF" },
+      { id: "S175", name: "Heliotrope", hex: "#DF73FF" },
+      { id: "S176", name: "Amethyst", hex: "#9966CC" },
+      { id: "S177", name: "Wisteria", hex: "#C9A0DC" },
+      { id: "S178", name: "Lilac", hex: "#C8A2C8" },
+      { id: "S179", name: "Periwinkle", hex: "#CCCCFF" },
+      { id: "S180", name: "Slate Blue", hex: "#6A5ACD" },
+      { id: "S181", name: "Ultramarine", hex: "#3F00FF" },
+      { id: "S182", name: "Cobalt Blue", hex: "#0047AB" },
+      { id: "S183", name: "Sapphire", hex: "#0F52BA" },
+      { id: "S184", name: "Prussian Blue", hex: "#003153" },
+      { id: "S185", name: "Denim", hex: "#1560BD" },
+      { id: "S186", name: "Cerulean", hex: "#007BA7" },
+      { id: "S187", name: "Robin Egg Blue", hex: "#00CCCC" },
+      { id: "S188", name: "Mint Green", hex: "#98FF98" },
+      { id: "S189", name: "Celadon", hex: "#ACE1AF" },
+      { id: "S190", name: "Viridian", hex: "#40826D" },
+      { id: "S191", name: "Myrtle", hex: "#317873" },
+      { id: "S192", name: "Pine Green", hex: "#01796F" },
+      { id: "S193", name: "Shamrock", hex: "#009E60" },
+      { id: "S194", name: "Lawn Green", hex: "#7CFC00" },
+      { id: "S195", name: "Neon Green", hex: "#39FF14" },
+      { id: "S196", name: "Pear", hex: "#D1E231" },
+      { id: "S197", name: "Citron", hex: "#9FA91F" },
+      { id: "S198", name: "Olive", hex: "#808000" },
+      { id: "S199", name: "Army Green", hex: "#4B5320" },
+      { id: "S200", name: "Moss Green", hex: "#8A9A5B" },
+      { id: "S201", name: "Sage", hex: "#BCB88A" },
+      { id: "S202", name: "Asparagus", hex: "#87A96B" },
+      { id: "S203", name: "Fern Green", hex: "#4F7942" },
+      { id: "S204", name: "Harlequin", hex: "#3FFF00" },
+      { id: "S205", name: "Malachite", hex: "#0BDA51" },
+      { id: "S206", name: "Jade", hex: "#00A36C" },
+      { id: "S207", name: "Emerald Green", hex: "#50C878" },
+      { id: "S208", name: "Sea Green", hex: "#2E8B57" },
+      { id: "S209", name: "Aquamarine", hex: "#7FFFD4" },
+      { id: "S210", name: "Light Cyan", hex: "#E0FFFF" },
+      { id: "S211", name: "Pale Turquoise", hex: "#AFEEEE" },
+      { id: "S212", name: "Dark Cyan", hex: "#008B8B" },
+      { id: "S213", name: "Cadet Blue", hex: "#5F9EA0" },
+      { id: "S214", name: "Steel Blue", hex: "#4682B4" },
+      { id: "S215", name: "Dodger Blue", hex: "#1E90FF" },
+      { id: "S216", name: "Deep Sky Blue", hex: "#00BFFF" },
+      { id: "S217", name: "Sky Blue", hex: "#87CEEB" },
+      { id: "S218", name: "Light Sky Blue", hex: "#87CEFA" },
+      { id: "S219", name: "Alice Blue", hex: "#F0F8FF" },
+      { id: "S220", name: "Lavender", hex: "#E6E6FA" },
+      { id: "S221", name: "Ghost White", hex: "#F8F8FF" },
+      { id: "S222", name: "Honeydew", hex: "#F0FFF0" },
+      { id: "S223", name: "Floral White", hex: "#FFFAF0" },
+      { id: "S224", name: "Old Lace", hex: "#FDF5E6" },
+      { id: "S225", name: "Linen", hex: "#FAF0E6" }
+    ];
+
+    let gridWidth = 24;
+    let gridHeight = 24;
+    let cellSize = 20; // 會依尺寸調整
+    let grid = [];     // 存 paletteConfig 的 index，-1 表示空白
+    let locked = [];   // 同尺寸布林陣列，true 表示該格鎖定
+    let currentColorIndex = 1; // 預設黑色
+    let isMouseDown = false;
+    let isDraggingPaint = false;
+    let viewMode = "grid"; // 'grid' or 'preview'
+    let tool = "brush";    // brush, eyedropper, bucket, lock
+    let bucketSelectedColors = new Set();
+    let lockDragMode = null; // "lock" 或 "unlock"
+
+
+    let undoStack = [];
+    let redoStack = [];
+
+    const canvas = document.getElementById("gridCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // ===== 工具按鈕管理 =====
+    const toolButtons = document.querySelectorAll(".tool-button");
+    function setTool(newTool) {
+      tool = newTool;
+      toolButtons.forEach(btn => btn.classList.remove("active"));
+      const map = {
+        brush: "toolBrush",
+        eyedropper: "toolEyedropper",
+        bucket: "toolBucket",
+        lock: "toolLock"
+      };
+      const id = map[newTool];
+      if (id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("active");
+      }
+      if (newTool !== "bucket") {
+        bucketSelectedColors.clear();
+        document.querySelectorAll(".color-chip").forEach(chip => chip.classList.remove("bucket-selected"));
+      }
+    }
+
+    document.getElementById("toolBrush").addEventListener("click", () => setTool("brush"));
+    document.getElementById("toolEyedropper").addEventListener("click", () => setTool("eyedropper"));
+    document.getElementById("toolBucket").addEventListener("click", () => {
+      setTool("bucket");
+      bucketSelectedColors.clear();
+      document.querySelectorAll(".color-chip").forEach(chip => chip.classList.remove("bucket-selected"));
+      alert("選色桶模式：在調色盤點選一個或多個色號，再點畫布一次性替換。若未選色，會以點擊格子的原色為目標。");
+    });
+    document.getElementById("toolLock").addEventListener("click", () => setTool("lock"));
+    // 一次解除所有鎖定
+    document.getElementById("toolUnlockAll").addEventListener("click", () => {
+      pushState(); // 支援 Undo
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          locked[y][x] = false;
+        }
+      }
+      drawGrid();
+    });
+
+
+    // ===== Undo / Redo =====
+    function pushState() {
+      // 儲存 grid 與 locked
+      const snapshot = JSON.stringify({ grid, locked });
+      undoStack.push(snapshot);
+      if (undoStack.length > 100) undoStack.shift(); // 避免爆掉
+      redoStack = [];
+    }
+
+    function restoreState(snapshot) {
+      if (!snapshot) return;
+      const state = JSON.parse(snapshot);
+      grid = state.grid;
+      locked = state.locked || locked;
+
+      gridHeight = grid.length;
+      gridWidth = grid[0]?.length || 0;
+      adjustCellSize();
+      drawGrid();
+      updateStats();
+    }
+
+    function doUndo() {
+      if (undoStack.length === 0) return;
+      const current = JSON.stringify({ grid, locked });
+      const prev = undoStack.pop();
+      redoStack.push(current);
+      restoreState(prev);
+    }
+
+    function doRedo() {
+      if (redoStack.length === 0) return;
+      const current = JSON.stringify({ grid, locked });
+      const next = redoStack.pop();
+      undoStack.push(current);
+      restoreState(next);
+    }
+
+    document.getElementById("btnUndo").addEventListener("click", doUndo);
+    document.getElementById("btnRedo").addEventListener("click", doRedo);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        doUndo();
+      }
+      if (e.ctrlKey && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault();
+        doRedo();
+      }
+    });
+
+    // ===== 初始化顏色盤 =====
+    const paletteEl = document.getElementById("palette");
+    paletteConfig.forEach((c, index) => {
+      const div = document.createElement("div");
+      div.className = "color-chip" + (index === currentColorIndex ? " active" : "");
+      div.style.backgroundColor = c.hex;
+      div.title = c.id + " - " + c.name;
+      const span = document.createElement("span");
+      span.textContent = c.id;
+      div.appendChild(span);
+
+      div.addEventListener("click", (e) => {
+        // 選色桶模式：把被點的色號加入 / 移除 bucketSelectedColors
+        if (tool === "bucket") {
+          if (bucketSelectedColors.has(index)) {
+            bucketSelectedColors.delete(index);
+            div.classList.remove("bucket-selected");
+          } else {
+            bucketSelectedColors.add(index);
+            div.classList.add("bucket-selected");
+          }
+          e.stopPropagation();
+          return;
+        }
+
+        // 一般模式：切換目前色號
+        currentColorIndex = index;
+        document.querySelectorAll(".color-chip").forEach(chip => chip.classList.remove("active"));
+        div.classList.add("active");
+      });
+
+      paletteEl.appendChild(div);
+    });
+
+    const toggleCodes = document.getElementById("toggleCodes");
+    toggleCodes.addEventListener("click", () => {
+      paletteEl.classList.toggle("hide-codes");
+      toggleCodes.textContent = paletteEl.classList.contains("hide-codes") ? "顯示色號" : "隱藏色號";
+    });
+
+    // ===== 產生 / 重設畫布 =====
+    function createEmptyGrid(w, h) {
+      gridWidth = w;
+      gridHeight = h;
+      grid = new Array(h);
+      locked = new Array(h);
+      for (let y = 0; y < h; y++) {
+        grid[y] = new Array(w).fill(-1);
+        locked[y] = new Array(w).fill(false);
+      }
+      adjustCellSize();
+      drawGrid();
+      updateStats();
+      undoStack = [];
+      redoStack = [];
+      pushState();
+    }
+
+    function adjustCellSize() {
+      const maxDisplaySize = 640; // px
+      const maxSide = Math.max(gridWidth, gridHeight);
+      cellSize = Math.floor(maxDisplaySize / maxSide);
+      cellSize = Math.max(10, Math.min(28, cellSize));
+
+      const labelSpace = 24;
+      canvas.width = gridWidth * cellSize + labelSpace;
+      canvas.height = gridHeight * cellSize + labelSpace;
+    }
+
+    function drawGrid() {
+      const labelSpace = 24;
+      // 清空畫布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 1. 畫欄號（上方）
+      ctx.font = "12px system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#777";
+
+      for (let x = 0; x < gridWidth; x++) {
+        const px = labelSpace + x * cellSize + cellSize / 2;
+        ctx.fillText(x + 1, px, labelSpace / 2);
+      }
+
+      // 2. 畫列號（左側）
+     for (let y = 0; y < gridHeight; y++) {
+       const py = labelSpace + y * cellSize + cellSize / 2;
+       ctx.fillText(y + 1, labelSpace / 2, py);
+     }
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const idx = grid[y][x];
+          const px = labelSpace + x * cellSize;
+          const py = labelSpace + y * cellSize;
+          ctx.fillStyle = idx >= 0 ? paletteConfig[idx].hex : "#fdfdfd";
+          ctx.fillRect(px, py, cellSize, cellSize);
+
+          // 網格線
+          ctx.strokeStyle = "#e0e0e0";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(px, py, cellSize, cellSize);
+
+          // 色號文字
+          if (viewMode === "grid" && idx >= 0 && cellSize >= 14) {
+            ctx.fillStyle = "#000";
+            ctx.font = `${Math.max(8, cellSize * 0.35)}px system-ui`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const label = paletteConfig[idx].id;
+            ctx.fillText(label, px + cellSize / 2, py + cellSize / 2);
+          }
+
+          // 鎖定標記
+          if (locked[y][x]) {
+            ctx.strokeStyle = "#f97373";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(px + 3, py + 3, cellSize - 6, cellSize - 6);
+          }
+        }
+      }
+      document.getElementById("infoSize").textContent = `${gridWidth} × ${gridHeight}`;
+    }
+
+    function getCellFromEvent(evt) {
+      const labelSpace = 24; // 與 drawGrid 使用的相同
+
+      const rect = canvas.getBoundingClientRect();
+      const mx = evt.clientX - rect.left;
+      const my = evt.clientY - rect.top;
+
+      // 扣掉上方與左側的標號空間
+      const x = Math.floor((mx - labelSpace) / cellSize);
+      const y = Math.floor((my - labelSpace) / cellSize);
+
+      // 標號區域（負值）時不要回傳格子
+      if (x < 0 || y < 0) return { x: -1, y: -1 };
+
+      return { x, y };
+    }
+
+
+    // ===== 畫布事件：填色 / 工具 =====
+    function handlePaint(evt) {
+      const { x, y } = getCellFromEvent(evt);
+      if (x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
+      if (locked[y][x]) return;
+      grid[y][x] = currentColorIndex;
+      drawGrid();
+      updateStats();
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      const { x, y } = getCellFromEvent(e);
+      if (x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
+
+      if (tool === "brush") {
+        pushState();
+        isMouseDown = true;
+        isDraggingPaint = true;
+        handlePaint(e);
+      } else if (tool === "eyedropper") {
+        const idx = grid[y][x];
+        if (idx >= 0) {
+          currentColorIndex = idx;
+          document.querySelectorAll(".color-chip").forEach(chip => chip.classList.remove("active"));
+          const chip = document.querySelectorAll(".color-chip")[idx];
+          if (chip) chip.classList.add("active");
+        }
+        setTool("brush");
+      } else if (tool === "lock") {
+        pushState(); // 支援 Undo
+
+        // 判斷此次拖曳是要「鎖」還是「解」
+        lockDragMode = locked[y][x] ? "unlock" : "lock";
+
+        // 先處理第一格
+        locked[y][x] = (lockDragMode === "lock");
+        drawGrid();
+
+        isMouseDown = true;
+        isDraggingPaint = true;
+      } else if (tool === "bucket") {
+        // 一次替換顏色
+        pushState();
+        const targets = new Set(bucketSelectedColors);
+        if (targets.size === 0) {
+          const baseIdx = grid[y][x];
+          if (baseIdx < 0) return;
+          targets.add(baseIdx);
+        }
+        for (let yy = 0; yy < gridHeight; yy++) {
+          for (let xx = 0; xx < gridWidth; xx++) {
+            if (targets.has(grid[yy][xx]) && !locked[yy][xx]) {
+              grid[yy][xx] = currentColorIndex;
+            }
+          }
+        }
+        bucketSelectedColors.clear();
+        document.querySelectorAll(".color-chip").forEach(chip => chip.classList.remove("bucket-selected"));
+        setTool("brush");
+        drawGrid();
+        updateStats();
+      }
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!isMouseDown) return;
+
+      const { x, y } = getCellFromEvent(e);
+      if (x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
+
+      // 畫筆拖曳
+      if (isDraggingPaint && tool === "brush") {
+        handlePaint(e);
+      }
+
+      // 鎖定拖曳
+      if (isDraggingPaint && tool === "lock") {
+        locked[y][x] = (lockDragMode === "lock");
+        drawGrid();
+      }
+    });
+
+
+    window.addEventListener("mouseup", () => {
+      isMouseDown = false;
+      isDraggingPaint = false;
+      lockDragMode = null;
+    });
+
+    // ===== 統計 =====
+    function updateStats() {
+      const colorCounts = new Array(paletteConfig.length).fill(0);
+      const rowCounts = new Array(gridHeight).fill(0);
+      let total = 0;
+
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const idx = grid[y][x];
+          if (idx >= 0) {
+            colorCounts[idx]++;
+            rowCounts[y]++;
+            total++;
+          }
+        }
+      }
+
+      document.getElementById("infoTotal").textContent = `總豆數：${total}`;
+
+      // 色號表
+      const tbody = document.querySelector("#colorStatsTable tbody");
+      tbody.innerHTML = "";
+      colorCounts.forEach((cnt, idx) => {
+        if (cnt === 0) return;
+        const tr = document.createElement("tr");
+        const tdCode = document.createElement("td");
+        tdCode.textContent = paletteConfig[idx].id;
+        const tdColor = document.createElement("td");
+        tdColor.className = "color-cell";
+        tdColor.style.backgroundColor = paletteConfig[idx].hex;
+        const tdCount = document.createElement("td");
+        tdCount.textContent = cnt;
+        tr.appendChild(tdCode);
+        tr.appendChild(tdColor);
+        tr.appendChild(tdCount);
+        tbody.appendChild(tr);
+      });
+
+      // 列統計
+      const rowStatsEl = document.getElementById("rowStats");
+      rowStatsEl.innerHTML = "";
+      for (let y = 0; y < gridHeight; y++) {
+        const div = document.createElement("div");
+        div.textContent = `第 ${y + 1} 列：${rowCounts[y]} 顆`;
+        rowStatsEl.appendChild(div);
+      }
+    }
+
+    // ===== 圖片 → 拼豆圖 =====
+    const imageInput = document.getElementById("imageInput");
+    const btnConvert = document.getElementById("btnConvert");
+
+    btnConvert.addEventListener("click", () => {
+      const file = imageInput.files && imageInput.files[0];
+      if (!file) {
+        alert("請先選擇一張圖片。");
+        return;
+      }
+      const maxSide = parseInt(document.getElementById("maxSide").value, 10) || 40;
+      const colorCount = parseInt(document.getElementById("colorCount").value, 10) || 12;
+
+      const img = new Image();
+      img.onload = () => {
+        const originalMax = Math.max(img.width, img.height);
+        const scale = maxSide / originalMax;
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+
+        const offCanvas = document.createElement("canvas");
+        offCanvas.width = w;
+        offCanvas.height = h;
+        const offCtx = offCanvas.getContext("2d");
+        offCtx.drawImage(img, 0, 0, w, h);
+
+        const imageData = offCtx.getImageData(0, 0, w, h).data;
+
+        const pixels = [];
+        for (let i = 0; i < imageData.length; i += 4) {
+          const r = imageData[i];
+          const g = imageData[i + 1];
+          const b = imageData[i + 2];
+          pixels.push([r, g, b]);
+        }
+
+        const palette = buildImagePalette(pixels, colorCount);
+
+        createEmptyGrid(w, h);
+        pushState();
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const idx = (y * w + x) * 4;
+            const r = imageData[idx];
+            const g = imageData[idx + 1];
+            const b = imageData[idx + 2];
+
+            const nearestImageColor = findNearestColor([r, g, b], palette);
+            const mappedPaletteIndex = mapToBeadPalette(nearestImageColor, paletteConfig);
+            grid[y][x] = mappedPaletteIndex;
+          }
+        }
+
+        drawGrid();
+        updateStats();
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    function buildImagePalette(pixels, maxColors) {
+      const sample = [];
+      const step = Math.max(1, Math.floor(pixels.length / 5000));
+      for (let i = 0; i < pixels.length; i += step) {
+        sample.push(pixels[i]);
+      }
+      sample.sort((a, b) => rgbToL(a) - rgbToL(b));
+      const palette = [];
+      const chunkSize = Math.max(1, Math.floor(sample.length / maxColors));
+      for (let i = 0; i < sample.length && palette.length < maxColors; i += chunkSize) {
+        palette.push(sample[i]);
+      }
+      return palette;
+    }
+
+    function rgbToL([r, g, b]) {
+      return 0.299 * r + 0.587 * g + 0.114 * b;
+    }
+
+    function findNearestColor(target, palette) {
+      let best = palette[0];
+      let bestDist = Infinity;
+      for (const c of palette) {
+        const dr = c[0] - target[0];
+        const dg = c[1] - target[1];
+        const db = c[2] - target[2];
+        const d = dr*dr + dg*dg + db*db;
+        if (d < bestDist) {
+          bestDist = d;
+          best = c;
+        }
+      }
+      return best;
+    }
+
+    function hexToRgb(hex) {
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      if (!m) return [0, 0, 0];
+      return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+    }
+
+    function mapToBeadPalette(rgb, beadPalette) {
+      let bestIndex = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < beadPalette.length; i++) {
+        const [r2, g2, b2] = hexToRgb(beadPalette[i].hex);
+        const dr = r2 - rgb[0];
+        const dg = g2 - rgb[1];
+        const db = b2 - rgb[2];
+        const d = dr*dr + dg*dg + db*db;
+        if (d < bestDist) {
+          bestDist = d;
+          bestIndex = i;
+        }
+      }
+      return bestIndex;
+    }
+
+    // ===== 模式切換：有色號 / 預覽 =====
+    const modeGridBtn = document.getElementById("modeGrid");
+    const modePreviewBtn = document.getElementById("modePreview");
+
+    modeGridBtn.addEventListener("click", () => {
+      viewMode = "grid";
+      modeGridBtn.classList.add("active");
+      modePreviewBtn.classList.remove("active");
+      drawGrid();
+    });
+
+    modePreviewBtn.addEventListener("click", () => {
+      viewMode = "preview";
+      modePreviewBtn.classList.add("active");
+      modeGridBtn.classList.remove("active");
+      drawGrid();
+    });
+
+    // ===== 匯出 PNG =====
+    const btnExport = document.getElementById("btnExport");
+
+    btnExport.addEventListener("click", () => {
+      if (!grid || gridWidth === 0 || gridHeight === 0) {
+        alert("目前沒有圖可以匯出。");
+        return;
+      }
+
+      const creator = document.getElementById("creatorName").value.trim() || "Unknown Artist";
+
+      const exportCell = 32;
+      const padding = 60;
+      const statsHeight = 140;
+      const exportW = gridWidth * exportCell + padding * 2;
+      const exportH = gridHeight * exportCell + padding * 2 + statsHeight;
+
+      const expCanvas = document.createElement("canvas");
+      expCanvas.width = exportW;
+      expCanvas.height = exportH;
+      const ectx = expCanvas.getContext("2d");
+
+      ectx.fillStyle = "#ffffff";
+      ectx.fillRect(0, 0, exportW, exportH);
+
+      ectx.fillStyle = "#222";
+      ectx.font = "20px system-ui";
+      ectx.textAlign = "left";
+      ectx.fillText(patternName, padding, 32);
+
+      ectx.font = "12px system-ui";
+      ectx.textAlign = "right";
+      const now = new Date();
+      const dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
+      ectx.fillText(`Designed by ${creator} · ${dateStr}`, exportW - padding, 32);
+
+      const offsetY = padding + 16;
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const idx = grid[y][x];
+          const px = padding + x * exportCell;
+          const py = offsetY + y * exportCell;
+          ectx.fillStyle = idx >= 0 ? paletteConfig[idx].hex : "#fdfdfd";
+          ectx.fillRect(px, py, exportCell, exportCell);
+
+          ectx.strokeStyle = "#cccccc";
+          ectx.lineWidth = 1;
+          ectx.strokeRect(px, py, exportCell, exportCell);
+
+          if (idx >= 0) {
+            ectx.fillStyle = "#000";
+            ectx.font = `${Math.max(10, exportCell * 0.35)}px system-ui`;
+            ectx.textAlign = "center";
+            ectx.textBaseline = "middle";
+            ectx.fillText(paletteConfig[idx].id, px + exportCell/2, py + exportCell/2);
+          }
+
+          if (locked[y][x]) {
+            ectx.strokeStyle = "#f97373";
+            ectx.lineWidth = 2;
+            ectx.strokeRect(px + 3, py + 3, exportCell - 6, exportCell - 6);
+          }
+        }
+      }
+
+      const colorCounts = new Array(paletteConfig.length).fill(0);
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const idx = grid[y][x];
+          if (idx >= 0) colorCounts[idx]++;
+        }
+      }
+
+      const statsTop = offsetY + gridHeight * exportCell + 30;
+      ectx.textAlign = "left";
+      ectx.fillStyle = "#222";
+      ectx.font = "14px system-ui";
+      ectx.fillText("Color usage:", padding, statsTop);
+
+      let col = 0;
+      let row = 0;
+      ectx.font = "12px system-ui";
+      for (let i = 0; i < paletteConfig.length; i++) {
+        if (!colorCounts[i]) continue;
+        const x = padding + col * 150;
+        const y = statsTop + 20 + row * 20;
+
+        ectx.strokeStyle = "#000";
+        ectx.lineWidth = 1;
+        ectx.strokeRect(x, y - 10, 16, 16);
+        ectx.fillStyle = paletteConfig[i].hex;
+        ectx.fillRect(x+1, y - 9, 14, 14);
+        ectx.fillStyle = "#222";
+        ectx.fillText(`${paletteConfig[i].id}  × ${colorCounts[i]}`, x + 24, y+2);
+
+        row++;
+        if (row >= 5) {
+          row = 0;
+          col++;
+        }
+      }
+
+	  // 來源網頁文字
+      ectx.font = "10px system-ui";
+      ectx.textAlign = "right";
+      ectx.fillStyle = "#666"; // 灰色小字
+      ectx.fillText("圖片製作來自Roy Dreambox https://loyiris.com/", exportW - padding, exportH - 8);
+
+      const link = document.createElement("a");
+      link.href = expCanvas.toDataURL("image/png");
+      link.download = "bead_pattern.png";
+      link.click();
+    });
+
+    // ===== 事件：重設畫布 =====
+    document.getElementById("btnResize").addEventListener("click", () => {
+      const w = parseInt(document.getElementById("gridWidth").value, 10) || 24;
+      const h = parseInt(document.getElementById("gridHeight").value, 10) || 24;
+      if (w < 5 || h < 5 || w > 80 || h > 80) {
+        alert("請輸入 5 ~ 80 之間的格數。");
+        return;
+      }
+      createEmptyGrid(w, h);
+    });
+
+    // ===== 初始化 =====
+    createEmptyGrid(gridWidth, gridHeight);
+    setTool("brush");
+  </script>
+</body>
+</html>
