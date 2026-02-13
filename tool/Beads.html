@@ -274,9 +274,9 @@
     <div class="section">
       <h2>畫布 / 網格</h2>
       <label>寬度（格數）</label>
-      <input type="number" id="gridWidth" min="5" max="120" value="30">
+      <input type="number" id="gridWidth" min="5" max="30" value="30">
       <label>高度（格數）</label>
-      <input type="number" id="gridHeight" min="5" max="120" value="30">
+      <input type="number" id="gridHeight" min="5" max="30" value="30">
       <button id="btnResize" class="primary">建立 / 重設畫布</button>
     </div>
 
@@ -286,9 +286,9 @@
       <label>選擇圖片</label>
       <input type="file" id="imageInput" accept="image/*">
       <label style="margin-top:6px;">最長邊（格數）</label>
-      <input type="number" id="maxSide" min="10" max="80" value="40">
+      <input type="number" id="maxSide" min="10" max="30" value="40">
       <label style="margin-top:6px;">顏色數量（調小會簡化）</label>
-      <input type="number" id="colorCount" min="2" max="32" value="12">
+      <input type="number" id="colorCount" min="2" max="30" value="12">
       <button id="btnConvert" class="primary" style="margin-top:6px;">轉成拼豆圖</button>
       <div style="font-size:11px;color:#777;margin-top:4px;">
         提示：最長邊越小、顏色數越少，圖會越簡化。
@@ -595,8 +595,8 @@
       { id: "S225", name: "Linen", hex: "#FAF0E6" }
     ];
 
-    let gridWidth = 24;
-    let gridHeight = 24;
+    let gridWidth = 30;
+    let gridHeight = 30;
     let cellSize = 20; // 會依尺寸調整
     let grid = [];     // 存 paletteConfig 的 index，-1 表示空白
     let locked = [];   // 同尺寸布林陣列，true 表示該格鎖定
@@ -774,13 +774,13 @@
       cellSize = Math.floor(maxDisplaySize / maxSide);
       cellSize = Math.max(10, Math.min(28, cellSize));
 
-      const labelSpace = 24;
+      const labelSpace = 30;
       canvas.width = gridWidth * cellSize + labelSpace;
       canvas.height = gridHeight * cellSize + labelSpace;
     }
 
     function drawGrid() {
-      const labelSpace = 24;
+      const labelSpace = 30;
       // 清空畫布
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
@@ -835,7 +835,7 @@
     }
 
     function getCellFromEvent(evt) {
-      const labelSpace = 24; // 與 drawGrid 使用的相同
+      const labelSpace = 30; // 與 drawGrid 使用的相同
 
       const rect = canvas.getBoundingClientRect();
       const mx = evt.clientX - rect.left;
@@ -1124,119 +1124,6 @@
       drawGrid();
     });
 
-    // ===== 匯出 PNG =====
-    const btnExport = document.getElementById("btnExport");
-
-    btnExport.addEventListener("click", () => {
-      if (!grid || gridWidth === 0 || gridHeight === 0) {
-        alert("目前沒有圖可以匯出。");
-        return;
-      }
-      const patternName = document.getElementById("patternName").value.trim() || "Bead Pattern";
-      const creator = document.getElementById("creatorName").value.trim() || "Unknown Artist";
-
-      const exportCell = 32;
-      const padding = 60;
-      const statsHeight = 140;
-      const exportW = gridWidth * exportCell + padding * 2;
-      const exportH = gridHeight * exportCell + padding * 2 + statsHeight;
-
-      const expCanvas = document.createElement("canvas");
-      expCanvas.width = exportW;
-      expCanvas.height = exportH;
-      const ectx = expCanvas.getContext("2d");
-
-      ectx.fillStyle = "#ffffff";
-      ectx.fillRect(0, 0, exportW, exportH);
-
-      ectx.fillStyle = "#222";
-      ectx.font = "20px system-ui";
-      ectx.textAlign = "left";
-      ectx.fillText(patternName, padding, 32);
-
-      ectx.font = "12px system-ui";
-      ectx.textAlign = "right";
-      const now = new Date();
-      const dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
-      ectx.fillText(`Designed by ${creator} · ${dateStr}`, exportW - padding, 32);
-
-      const offsetY = padding + 16;
-      for (let y = 0; y < gridHeight; y++) {
-        for (let x = 0; x < gridWidth; x++) {
-          const idx = grid[y][x];
-          const px = padding + x * exportCell;
-          const py = offsetY + y * exportCell;
-          ectx.fillStyle = idx >= 0 ? paletteConfig[idx].hex : "#fdfdfd";
-          ectx.fillRect(px, py, exportCell, exportCell);
-
-          ectx.strokeStyle = "#cccccc";
-          ectx.lineWidth = 1;
-          ectx.strokeRect(px, py, exportCell, exportCell);
-
-          if (idx >= 0) {
-            ectx.fillStyle = "#000";
-            ectx.font = `${Math.max(10, exportCell * 0.35)}px system-ui`;
-            ectx.textAlign = "center";
-            ectx.textBaseline = "middle";
-            ectx.fillText(paletteConfig[idx].id, px + exportCell/2, py + exportCell/2);
-          }
-
-          if (locked[y][x]) {
-            ectx.strokeStyle = "#f97373";
-            ectx.lineWidth = 2;
-            ectx.strokeRect(px + 3, py + 3, exportCell - 6, exportCell - 6);
-          }
-        }
-      }
-
-      const colorCounts = new Array(paletteConfig.length).fill(0);
-      for (let y = 0; y < gridHeight; y++) {
-        for (let x = 0; x < gridWidth; x++) {
-          const idx = grid[y][x];
-          if (idx >= 0) colorCounts[idx]++;
-        }
-      }
-
-      const statsTop = offsetY + gridHeight * exportCell + 30;
-      ectx.textAlign = "left";
-      ectx.fillStyle = "#222";
-      ectx.font = "14px system-ui";
-      ectx.fillText("Color usage:", padding, statsTop);
-
-      let col = 0;
-      let row = 0;
-      ectx.font = "12px system-ui";
-      for (let i = 0; i < paletteConfig.length; i++) {
-        if (!colorCounts[i]) continue;
-        const x = padding + col * 150;
-        const y = statsTop + 20 + row * 20;
-
-        ectx.strokeStyle = "#000";
-        ectx.lineWidth = 1;
-        ectx.strokeRect(x, y - 10, 16, 16);
-        ectx.fillStyle = paletteConfig[i].hex;
-        ectx.fillRect(x+1, y - 9, 14, 14);
-        ectx.fillStyle = "#222";
-        ectx.fillText(`${paletteConfig[i].id}  × ${colorCounts[i]}`, x + 24, y+2);
-
-        row++;
-        if (row >= 5) {
-          row = 0;
-          col++;
-        }
-      }
-
-	  // 來源網頁文字
-      ectx.font = "10px system-ui";
-      ectx.textAlign = "right";
-      ectx.fillStyle = "#666"; // 灰色小字
-      ectx.fillText("圖片製作來自Roy Dreambox https://loyiris.com/", exportW - padding, exportH - 8);
-
-      const link = document.createElement("a");
-      link.href = expCanvas.toDataURL("image/png");
-      link.download = "bead_pattern.png";
-      link.click();
-    });
 
     // ===== 事件：重設畫布 =====
     document.getElementById("btnResize").addEventListener("click", () => {
