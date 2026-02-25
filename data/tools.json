@@ -108,7 +108,7 @@
     {
       "title": "JavaScript 混淆器",
       "icon": "/img/jso.png",
-      "url": "/tools/js-obfuscator.html",
+      "url": "/tools/js-obfuscator/",
       "category": "編碼解碼工具",
       "common": true,
 	  "created": "2026-02-25"
