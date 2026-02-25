@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JavaScript 混淆器 | Roy Dreambox</title>
+  <meta name="description" content="線上 JavaScript 混淆器：可調整強度、支援快速美化（反混淆可讀化），免安裝、手機可用。" />
+
+  <link rel="stylesheet" href="/global.css" />
+  <link rel="stylesheet" href="/css/loyui.css" />
+  <script src="/js/loadHeader.js"></script>
+
+  <!-- 混淆 + 美化（反混淆/可讀化） -->
+  <script src="https://unpkg.com/javascript-obfuscator/dist/index.browser.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-beautify@1.15.1/js/lib/beautify.js"></script>
+
+  <style>
+    .tool-wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+    .tool-title { font-size: 26px; margin: 8px 0 8px; }
+    .tool-desc { color: #666; margin: 0 0 16px; line-height: 1.6; }
+    .panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .box h2 { font-size: 16px; margin: 0 0 10px; }
+    textarea.loy-input { min-height: 360px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .row label { font-weight: 600; font-size: 13px; }
+    select.loy-input, input[type="number"].loy-input { padding: 10px 12px; font-size: 14px; }
+    .hint { font-size: 12px; color: #777; margin-top: 8px; line-height: 1.5; }
+    .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+    .mini { font-size: 12px; opacity: .9; }
+
+    @media (max-width: 768px) {
+      .panel { grid-template-columns: 1fr; }
+      textarea.loy-input { min-height: 260px; }
+      .controls { grid-template-columns: 1fr; }
+      .actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+  <script>
+    loadHeader("文本工具", "JavaScript 混淆器");
+    document.title = `JavaScript 混淆器 | Roy Dreambox`;
+  </script>
+
+  <main class="tool-wrap">
+    <h1 class="tool-title">JavaScript 混淆器</h1>
+    <p class="tool-desc">
+      把 JS 變得更難讀（但不是無敵防護）。支援強度選擇、可選擇保留主控台輸出、
+      以及「快速可讀化」（把壓縮/混淆後的碼美化排版）。
+    </p>
+
+    <div class="loy-divider"></div>
+
+    <section class="panel">
+      <div class="loy-card box">
+        <h2>輸入（原始 JS）</h2>
+        <textarea id="input" class="loy-input" placeholder="貼上你的 JavaScript..."></textarea>
+
+        <div class="controls">
+          <div class="row">
+            <label for="preset">強度</label>
+            <select id="preset" class="loy-input">
+              <option value="low">低（較可讀）</option>
+              <option value="normal" selected>一般（推薦）</option>
+              <option value="high">高（更難讀）</option>
+              <option value="extreme">極高（較慢、較難除錯）</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="seed">Seed（可重現）</label>
+            <input id="seed" class="loy-input" type="number" min="0" placeholder="留空=隨機" />
+          </div>
+
+          <div class="row">
+            <label><input id="keepConsole" type="checkbox" checked /> 保留 console.*</label>
+            <label><input id="sourceMap" type="checkbox" /> 產生 SourceMap（除錯用）</label>
+          </div>
+
+          <div class="row">
+            <label><input id="compact" type="checkbox" checked /> 壓縮輸出（compact）</label>
+            <label><input id="specialChars" type="checkbox" /> 特殊字元轉義（unicodeEscapeSequence）</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="tool-btn" id="btnObf">Obfuscate</button>
+          <button class="tool-btn secondary" id="btnBeautify">Fast Decode（可讀化）</button>
+          <button class="tool-btn secondary" id="btnClear">Clear</button>
+        </div>
+
+        <div class="hint">
+          <div class="mini">提醒：真正敏感邏輯放後端，前端只保留 UI/呼叫</div>
+        </div>
+      </div>
+
+      <div class="loy-card box">
+        <h2>輸出</h2>
+        <textarea id="output" class="loy-input" placeholder="混淆或可讀化結果會出現在這裡..." readonly></textarea>
+
+        <div class="actions">
+          <button class="tool-btn" id="btnCopy">Copy</button>
+          <button class="tool-btn secondary" id="btnSwap">Swap（把輸出丟回輸入）</button>
+        </div>
+
+        <div id="status" class="hint" style="display:none;"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="global-buttons"></div>
+  <script src="/js/global.js"></script>
+  <script src="/js/loyui.js"></script>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function toast(msg, ok = true) {
+      const el = $("status");
+      el.style.display = "block";
+      el.style.color = ok ? "#2f6f3a" : "#a33";
+      el.textContent = msg;
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+    }
+
+    function buildOptions() {
+      const preset = $("preset").value;
+      const keepConsole = $("keepConsole").checked;
+      const compact = $("compact").checked;
+      const specialChars = $("specialChars").checked;
+      const sourceMap = $("sourceMap").checked;
+
+      const seedRaw = $("seed").value.trim();
+      const seed = seedRaw === "" ? Math.floor(Math.random() * 1e9) : Number(seedRaw);
+
+      // 基本盤
+      const base = {
+        compact,
+        seed,
+        selfDefending: false,
+        simplify: true,
+        unicodeEscapeSequence: specialChars,
+        sourceMap,
+        sourceMapMode: sourceMap ? "separate" : undefined,
+        sourceMapFileName: sourceMap ? "obfuscation.map" : undefined,
+
+        // console 的處理：keepConsole=true -> 不做 debugProtection / disableConsoleOutput
+        disableConsoleOutput: !keepConsole,
+        debugProtection: false,
+        debugProtectionInterval: false
+      };
+
+      // 強度預設（偏務實）
+      const presets = {
+        low: {
+          ...base,
+          controlFlowFlattening: false,
+          stringArray: true,
+          stringArrayThreshold: 0.35
+        },
+        normal: {
+          ...base,
+          controlFlowFlattening: true,
+          controlFlowFlatteningThreshold: 0.35,
+          stringArray: true,
+          stringArrayThreshold: 0.65,
+          deadCodeInjection: false
+        },
+        high: {
+          ...base,
+          controlFlowFlattening: true,
+          controlFlowFlatteningThreshold: 0.75,
+          stringArray: true,
+          stringArrayThreshold: 0.9,
+          deadCodeInjection: true,
+          deadCodeInjectionThreshold: 0.2
+        },
+        extreme: {
+          ...base,
+          controlFlowFlattening: true,
+          controlFlowFlatteningThreshold: 1.0,
+          stringArray: true,
+          stringArrayThreshold: 1.0,
+          deadCodeInjection: true,
+          deadCodeInjectionThreshold: 0.5,
+          splitStrings: true,
+          splitStringsChunkLength: 6
+        }
+      };
+
+      return presets[preset] || presets.normal;
+    }
+
+    function obfuscate() {
+      const code = $("input").value;
+      if (!code.trim()) return toast("請先貼上 JavaScript。", false);
+
+      try {
+        const options = buildOptions();
+        const result = JavaScriptObfuscator.obfuscate(code, options);
+        $("output").value = result.getObfuscatedCode();
+
+        // 如果開 sourceMap，就提示
+        if (options.sourceMap) {
+          toast("混淆完成（已開 SourceMap）。輸出為混淆碼；Map 需你自行保存。");
+        } else {
+          toast("混淆完成。");
+        }
+      } catch (e) {
+        console.error(e);
+        toast("混淆失敗：可能是語法錯誤或太新的語法不支援。", false);
+      }
+    }
+
+    function beautifyOutput() {
+      const src = $("input").value.trim() ? $("input").value : $("output").value;
+      const code = src.trim();
+      if (!code) return toast("沒有內容可以可讀化。", false);
+
+      try {
+        const pretty = js_beautify(code, {
+          indent_size: 2,
+          space_in_empty_paren: true,
+          preserve_newlines: true,
+          max_preserve_newlines: 2
+        });
+        $("output").value = pretty;
+        toast("可讀化完成（注意：不等於真正反混淆）。");
+      } catch (e) {
+        console.error(e);
+        toast("可讀化失敗。", false);
+      }
+    }
+
+    function clearAll() {
+      $("input").value = "";
+      $("output").value = "";
+      $("seed").value = "";
+      $("preset").value = "normal";
+      $("keepConsole").checked = true;
+      $("sourceMap").checked = false;
+      $("compact").checked = true;
+      $("specialChars").checked = false;
+      toast("已清空。");
+    }
+
+    async function copyOut() {
+      const text = $("output").value;
+      if (!text.trim()) return toast("輸出是空的。", false);
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("已複製到剪貼簿。");
+      } catch {
+        // fallback
+        $("output").select();
+        document.execCommand("copy");
+        toast("已複製到剪貼簿。");
+      }
+    }
+
+    function swap() {
+      const out = $("output").value;
+      if (!out.trim()) return toast("沒有輸出可以丟回輸入。", false);
+      $("input").value = out;
+      toast("已把輸出放回輸入。");
+    }
+
+    $("btnObf").addEventListener("click", obfuscate);
+    $("btnBeautify").addEventListener("click", beautifyOutput);
+    $("btnClear").addEventListener("click", clearAll);
+    $("btnCopy").addEventListener("click", copyOut);
+    $("btnSwap").addEventListener("click", swap);
+  </script>
+</body>
+</html>
