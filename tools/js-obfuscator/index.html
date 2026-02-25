@@ -20,7 +20,10 @@
     .tool-desc { color: #666; margin: 0 0 16px; line-height: 1.6; }
     .panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .box h2 { font-size: 16px; margin: 0 0 10px; }
-    textarea.loy-input { min-height: 360px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    textarea.loy-input {
+      min-height: 360px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
     .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
     .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .row label { font-weight: 600; font-size: 13px; }
@@ -45,13 +48,6 @@
     document.title = `JavaScript 混淆器 | Roy Dreambox`;
   </script>
 
-  <main class="tool-wrap">
-    <h1 class="tool-title">JavaScript 混淆器</h1>
-    <p class="tool-desc">
-      把 JS 變得更難讀（但不是無敵防護）。支援強度選擇、可選擇保留主控台輸出、
-      以及「快速可讀化」（把壓縮/混淆後的碼美化排版）。
-    </p>
-
     <div class="loy-divider"></div>
 
     <section class="panel">
@@ -63,10 +59,10 @@
           <div class="row">
             <label for="preset">強度</label>
             <select id="preset" class="loy-input">
-              <option value="low">低（較可讀）</option>
+              <option value="low">低</option>
               <option value="normal" selected>一般（推薦）</option>
-              <option value="high">高（更難讀）</option>
-              <option value="extreme">極高（較慢、較難除錯）</option>
+              <option value="high">高</option>
+              <option value="extreme">極高（較慢）</option>
             </select>
           </div>
 
@@ -124,7 +120,7 @@
       el.style.color = ok ? "#2f6f3a" : "#a33";
       el.textContent = msg;
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+      toast._t = setTimeout(() => { el.style.display = "none"; }, 2600);
     }
 
     function buildOptions() {
@@ -137,24 +133,28 @@
       const seedRaw = $("seed").value.trim();
       const seed = seedRaw === "" ? Math.floor(Math.random() * 1e9) : Number(seedRaw);
 
-      // 基本盤
+      // 只放「合法型別」的欄位
       const base = {
-        compact,
-        seed,
-        selfDefending: false,
+        compact: compact,
+        seed: seed,
         simplify: true,
+        selfDefending: false,
         unicodeEscapeSequence: specialChars,
-        sourceMap,
-        sourceMapMode: sourceMap ? "separate" : undefined,
-        sourceMapFileName: sourceMap ? "obfuscation.map" : undefined,
 
-        // console 的處理：keepConsole=true -> 不做 debugProtection / disableConsoleOutput
+        // console
         disableConsoleOutput: !keepConsole,
-        debugProtection: false,
-        debugProtectionInterval: false
+
+        // 這頁先不做 debugProtection，就不要放 debugProtectionInterval
+        debugProtection: false
       };
 
-      // 強度預設（偏務實）
+      // sourceMa
+      if (sourceMap) {
+        base.sourceMap = true;
+        base.sourceMapMode = "separate";           // 只能是 "inline" or "separate"
+        base.sourceMapFileName = "obfuscation.map"; // 必須 string
+      }
+
       const presets = {
         low: {
           ...base,
@@ -199,12 +199,16 @@
       const code = $("input").value;
       if (!code.trim()) return toast("請先貼上 JavaScript。", false);
 
+      // CDN 沒載到時給明確訊息
+      if (typeof JavaScriptObfuscator === "undefined") {
+        return toast("混淆引擎載入失敗：JavaScriptObfuscator 不存在（可能 CDN 被擋）。", false);
+      }
+
       try {
         const options = buildOptions();
         const result = JavaScriptObfuscator.obfuscate(code, options);
         $("output").value = result.getObfuscatedCode();
 
-        // 如果開 sourceMap，就提示
         if (options.sourceMap) {
           toast("混淆完成（已開 SourceMap）。輸出為混淆碼；Map 需你自行保存。");
         } else {
@@ -212,7 +216,13 @@
         }
       } catch (e) {
         console.error(e);
-        toast("混淆失敗：可能是語法錯誤或太新的語法不支援。", false);
+        const msg = String(e?.message || e);
+
+        if (msg.includes("Validation failed")) {
+          return toast("混淆失敗：選項不合法（請看 Console 的 Validation failed 細節）。", false);
+        }
+
+        toast("混淆失敗：可能是語法錯誤或瀏覽器/引擎不支援。", false);
       }
     }
 
@@ -222,6 +232,10 @@
       if (!code) return toast("沒有內容可以可讀化。", false);
 
       try {
+        if (typeof js_beautify === "undefined") {
+          return toast("可讀化引擎載入失敗：js_beautify 不存在（可能 CDN 被擋）。", false);
+        }
+
         const pretty = js_beautify(code, {
           indent_size: 2,
           space_in_empty_paren: true,
@@ -255,7 +269,6 @@
         await navigator.clipboard.writeText(text);
         toast("已複製到剪貼簿。");
       } catch {
-        // fallback
         $("output").select();
         document.execCommand("copy");
         toast("已複製到剪貼簿。");
@@ -269,11 +282,18 @@
       toast("已把輸出放回輸入。");
     }
 
-    $("btnObf").addEventListener("click", obfuscate);
-    $("btnBeautify").addEventListener("click", beautifyOutput);
-    $("btnClear").addEventListener("click", clearAll);
-    $("btnCopy").addEventListener("click", copyOut);
-    $("btnSwap").addEventListener("click", swap);
+    // 防呆：避免某個按鈕 id 不見就整段 script 直接爆炸
+    function on(id, evt, fn) {
+      const el = $(id);
+      if (!el) return console.warn(`[bind] missing #${id}`);
+      el.addEventListener(evt, fn);
+    }
+
+    on("btnObf", "click", obfuscate);
+    on("btnBeautify", "click", beautifyOutput);
+    on("btnClear", "click", clearAll);
+    on("btnCopy", "click", copyOut);
+    on("btnSwap", "click", swap);
   </script>
 </body>
 </html>
