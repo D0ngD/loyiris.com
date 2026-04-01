@@ -3,197 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 應用規劃師初級｜第二科 生成式 AI 應用與規劃｜Roy Dreambox</title>
-  <meta name="description" content="AI 應用規劃師初級第二科生成式 AI 應用與規劃逐題作答版，可逐題提交查看答案與解析。">
-  <link rel="stylesheet" href="/global.css">
-  <link rel="stylesheet" href="/css/loyui.css">
-  <script src="/js/loadHeader.js"></script>
+  <title>AI 應用規劃師初級｜第二科 生成式 AI 應用與規劃</title>
+  <meta name="description" content="第二科生成式 AI 應用與規劃逐題作答版。">
   <style>
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px 16px 60px;
+    :root {
+      --bg: #f6f1ec;
+      --card: #ffffff;
+      --text: #2f2926;
+      --muted: #7b6e66;
+      --line: #dccfc4;
+      --primary: #b89171;
+      --primary-deep: #9b785d;
+      --ok-bg: #eef8ef;
+      --ok-border: #bcdcbc;
+      --bad-bg: #fff1f0;
+      --bad-border: #efc3bf;
+      --note-bg: #f8f5ff;
+      --note-border: #d8cff8;
+      --shadow: 0 10px 28px rgba(99, 76, 58, 0.08);
     }
-    .exam-hero {
-      margin-top: 16px;
-    }
-    .exam-hero p {
-      margin: 8px 0 0;
-      color: #666;
-      line-height: 1.7;
-    }
-    .legend {
-      margin-top: 14px;
-      color: #666;
-      font-size: 14px;
-    }
-    .question-list {
-      display: grid;
-      gap: 18px;
-      margin-top: 20px;
-    }
-    .question-card {
-      padding: 20px;
-    }
-    .qhead {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-    .qnum {
-      min-width: 80px;
-      text-align: center;
-      border-radius: 12px;
-      padding: 8px 10px;
-      background: #f7f8fb;
-      border: 1px solid var(--border);
-      font-weight: 700;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.65), transparent 28%), linear-gradient(180deg, #f8f4ef 0%, #f2ebe4 100%);
       color: var(--text);
-      font-size: 14px;
+      line-height: 1.65;
     }
-    .qtext {
-      font-size: 16px;
-      font-weight: 700;
-      flex: 1;
-      min-width: 260px;
-      line-height: 1.7;
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(248, 244, 239, 0.9);
+      border-bottom: 1px solid rgba(220, 207, 196, 0.85);
     }
-    .status {
-      font-size: 13px;
-      color: #777;
-      white-space: nowrap;
+    .topbar-inner {
+      max-width: 1100px; margin: 0 auto; padding: 14px 18px;
+      display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
     }
-    .options {
-      display: grid;
-      gap: 10px;
-      margin-top: 10px;
+    .brand { font-weight: 800; font-size: 1.05rem; letter-spacing: .02em; }
+    .chip { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: 8px 12px; font-size: .92rem; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 18px 80px; }
+    .hero, .question-card {
+      background: rgba(255,255,255,.82); border: 1px solid rgba(220,207,196,.9); border-radius: 22px; box-shadow: var(--shadow);
     }
+    .hero { padding: 26px 22px; margin-bottom: 22px; }
+    h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3vw, 2.15rem); }
+    .sub { color: var(--muted); margin: 0; }
+    .legend { margin-top: 14px; color: var(--muted); font-size: .96rem; }
+    .legend b { color: var(--text); }
+    .question-list { display: grid; gap: 18px; }
+    .question-card { padding: 20px; }
+    .qhead { display:flex; gap:12px; align-items:flex-start; justify-content:space-between; margin-bottom: 12px; }
+    .qnum { min-width: 52px; text-align:center; border-radius: 14px; padding: 8px 10px; background: #f6ede5; border:1px solid var(--line); font-weight:800; }
+    .qtext { font-size: 1.02rem; font-weight: 700; flex:1; }
+    .status { font-size: .9rem; color: var(--muted); }
+    .options { display:grid; gap: 10px; margin-top: 10px; }
     .opt {
-      display: block;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: var(--card-bg);
-      cursor: pointer;
-      transition: 0.2s;
-      line-height: 1.7;
+      display:block; border:1px solid var(--line); border-radius: 14px; padding: 12px 14px; background:#fff; cursor:pointer; transition:.18s;
     }
-    .opt:hover {
-      border-color: var(--loy-blue);
-      box-shadow: 0 0 0 3px rgba(106, 167, 255, 0.14);
+    .opt:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,.04); }
+    .opt input { margin-right: 8px; }
+    .opt.correct { background: var(--ok-bg); border-color: var(--ok-border); }
+    .opt.wrong { background: var(--bad-bg); border-color: var(--bad-border); }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
+    button {
+      border:none; border-radius: 12px; padding: 11px 16px; font-size: .96rem; font-weight: 700; cursor:pointer; transition:.18s;
     }
-    .opt input {
-      margin-right: 8px;
-    }
-    .opt.correct {
-      background: #eef8ef;
-      border-color: #bcdcbc;
-    }
-    .opt.wrong {
-      background: #fff1f0;
-      border-color: #efc3bf;
-    }
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
+    .btn-primary { background: var(--primary); color:#fff; }
+    .btn-primary:hover { background: var(--primary-deep); }
+    .btn-secondary { background: #efe6dd; color: var(--text); }
+    .btn-secondary:hover { background: #e6d9cd; }
     .feedback, .explanation {
-      margin-top: 14px;
-      border-radius: 12px;
-      padding: 14px 15px;
-      display: none;
+      margin-top: 14px; border-radius: 16px; padding: 14px 15px; display:none;
     }
-    .feedback.ok {
-      display: block;
-      background: #eef8ef;
-      border: 1px solid #bcdcbc;
-    }
-    .feedback.bad {
-      display: block;
-      background: #fff1f0;
-      border: 1px solid #efc3bf;
-    }
-    .feedback.empty {
-      display: block;
-      background: #fff8e8;
-      border: 1px solid #ead8a6;
-    }
-    .feedback strong {
-      display: block;
-      margin-bottom: 6px;
-    }
-    .explanation {
-      background: #f8f5ff;
-      border: 1px solid #d8cff8;
-    }
-    .explanation h4 {
-      margin: 0 0 8px;
-      font-size: 15px;
-    }
+    .feedback.ok { display:block; background: var(--ok-bg); border:1px solid var(--ok-border); }
+    .feedback.bad { display:block; background: var(--bad-bg); border:1px solid var(--bad-border); }
+    .feedback.empty { display:block; background: #fff8e8; border:1px solid #ead8a6; }
+    .feedback strong { display:block; margin-bottom: 6px; }
+    .explanation { background: var(--note-bg); border:1px solid var(--note-border); }
+    .explanation h4 { margin:0 0 8px; font-size: 1rem; }
     .explanation textarea {
-      width: 100%;
-      min-height: 108px;
-      resize: vertical;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      padding: 12px;
-      font: inherit;
-      background: var(--card-bg);
-      line-height: 1.6;
-      box-sizing: border-box;
+      width:100%; min-height: 108px; resize: vertical; border-radius: 12px; border:1px solid #d7d1e8; padding: 12px; font: inherit; background:#fff;
     }
-    .explanation textarea:focus {
-      outline: none;
-      border-color: var(--loy-blue);
-      box-shadow: 0 0 0 3px rgba(106, 167, 255, 0.18);
-    }
-    .footer-note {
-      color: #666;
-      margin-top: 18px;
-      font-size: 13px;
-      line-height: 1.7;
-    }
+    .footer-note { color: var(--muted); margin-top: 18px; font-size: .92rem; }
     @media (max-width: 700px) {
-      .question-card {
-        padding: 16px;
-      }
-      .qhead {
-        flex-direction: column;
-      }
-      .qnum {
-        min-width: unset;
-        width: fit-content;
-      }
-      .actions .tool-btn {
-        width: 100%;
-      }
+      .question-card { padding: 16px; }
+      .qhead { flex-direction: column; }
+      .qnum { min-width: unset; width: fit-content; }
+      .actions button { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <div id="header"></div>
-  <script>
-    loadHeader("AI / 學習工具", "AI 應用規劃師初級｜第二科");
-  </script>
-
-  <main>
-
-    <section class="loy-card exam-hero">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">AI 應用規劃師初級｜第二科 生成式 AI 應用與規劃 </div>
+      <div class="chip">僅供學習使用</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <section class="hero">
       <h1>生成式 AI 應用與規劃</h1>
-      <p>這份頁面可逐題作答，提交後立即顯示對錯與解析區塊，方便自己練習與補充筆記。</p>
-      <p class="legend"><strong>使用方式：</strong>選一個答案 → 按「提交本題」→ 立即看結果；想重做可按「重作本題」。</p>
+      <p class="legend"><b>使用方式：</b>選一個答案 → 按「提交本題」→ 立即看結果；想重做可按「重作本題」。</p>
     </section>
     <div id="questionList" class="question-list"></div>
-    <section class="loy-card" style="margin-top:20px;">
-      <div class="loy-card-title">補充說明</div>
-      <p class="footer-note">題目由 iPAS 官方提供（題目釋出日期為 114 年，部分內容可能已過時，相關情況可寫在解析中），解析為版主手動撰寫，若有錯誤歡迎再自行修正。</p>
-    </section>
-  </main>
+    <p class="footer-note">題目由iPAS官方提供(題目釋出日期為114年，當中有過時的題目也有寫在解析中了)，解析為版主手動撰寫，若有錯誤歡迎來信糾正。</p>
+  </div>
 <script>
 const questions = [
 {"n": 1, "answer": "B", "q": "在 Low Code 平台的開發應用設計中，關於「模型（Model）」，下列敘述何者最符合實際情況？", 
@@ -517,8 +433,8 @@ function render() {
         `).join('')}
       </div>
       <div class="actions">
-        <button class="tool-btn" onclick="submitQuestion(${item.n})">提交本題</button>
-        <button class="tool-btn secondary" onclick="resetQuestion(${item.n})">重作本題</button>
+        <button class="btn-primary" onclick="submitQuestion(${item.n})">提交本題</button>
+        <button class="btn-secondary" onclick="resetQuestion(${item.n})">重作本題</button>
       </div>
       <div class="feedback" id="feedback-${item.n}"></div>
       <div class="explanation" id="explanation-${item.n}">
@@ -588,10 +504,5 @@ function resetQuestion(n) {
 
 render();
 </script>
-
-  <div id="warnMsg"></div>
-  <div id="global-buttons"></div>
-  <script src="/js/global.js"></script>
-  <script src="/js/loyui.js"></script>
 </body>
 </html>
