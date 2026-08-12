@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="直接在瀏覽器遊玩《Harrow Court》繁體中文懸疑文字冒險遊戲。">
+  <title>Harrow Court｜Web Game</title>
+  <link rel="icon" href="../assets/images/ui/ui_pocket_watch.png">
+  <link rel="stylesheet" href="../css/game.css">
+</head>
+<body>
+  <main id="game-app" class="game-app" aria-live="polite">
+    <section class="title-screen" id="title-screen" aria-labelledby="game-title">
+      <div class="title-panel">
+        <p class="kicker">A seven-day mystery</p>
+        <h1 id="game-title">Harrow<br><em>Court</em></h1>
+        <p>牆後有人記得你的名字</p>
+        <div class="title-actions">
+          <button class="primary" id="new-game" type="button">開始新遊戲</button>
+          <button id="continue-game" type="button">繼續遊戲</button>
+          <button data-open="load-modal" type="button">讀取存檔</button>
+          <a href="../">返回官方網站</a>
+        </div>
+        <p class="save-note">進度只儲存在目前瀏覽器，不會上傳。</p>
+      </div>
+    </section>
+
+    <section class="play-view" id="play-view" hidden aria-label="遊戲畫面">
+      <div class="scene-layer" id="scene-layer"></div>
+      <div class="scene-vignette"></div>
+      <div class="portraits" id="portraits" aria-hidden="true"></div>
+      <header class="game-hud">
+        <div class="clock"><img src="../assets/images/ui/ui_pocket_watch.png" alt=""><span><b id="hud-day">DAY 1・黃昏</b><small id="hud-time">18:35</small></span></div>
+        <nav aria-label="遊戲功能">
+          <button id="auto-toggle" type="button" aria-pressed="false">自動</button>
+          <button data-open="save-modal" type="button">存檔</button>
+          <button data-open="load-modal" type="button">讀檔</button>
+          <button data-open="settings-modal" type="button">設定</button>
+          <button data-open="status-modal" type="button">狀態</button>
+          <button id="title-button" type="button">標題</button>
+        </nav>
+      </header>
+      <aside class="debug-panel" id="debug-panel" hidden></aside>
+      <section class="dialogue-shell" id="dialogue-shell" tabindex="0" role="button" aria-label="對話；點擊可顯示全文或前進">
+        <div class="speaker" id="speaker"></div>
+        <p class="dialogue" id="dialogue"></p>
+        <span class="advance-mark" id="advance-mark" aria-hidden="true">⌄</span>
+      </section>
+      <section class="choices" id="choices" aria-label="選項" hidden></section>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="fatal-error" id="fatal-error" hidden><h2>遊戲資料載入失敗</h2><p id="fatal-message"></p><a href="../">返回官方網站</a></div>
+
+  <dialog class="modal" id="save-modal"><form method="dialog"><header><h2>儲存進度</h2><button value="cancel" aria-label="關閉">×</button></header><div class="slot-list" data-mode="save"></div></form></dialog>
+  <dialog class="modal" id="load-modal"><form method="dialog"><header><h2>讀取進度</h2><button value="cancel" aria-label="關閉">×</button></header><div class="slot-list" data-mode="load"></div></form></dialog>
+  <dialog class="modal" id="settings-modal"><form method="dialog"><header><h2>設定</h2><button value="cancel" aria-label="關閉">×</button></header><div class="settings-grid">
+    <fieldset><legend>文字速度</legend><div class="speed-options"><label><input type="radio" name="text-speed" value="slow">慢</label><label><input type="radio" name="text-speed" value="normal">普通</label><label><input type="radio" name="text-speed" value="fast">快</label><label><input type="radio" name="text-speed" value="instant">瞬間</label></div></fieldset>
+    <label>BGM 音量 <output id="bgm-output">70%</output><input id="bgm-volume" type="range" min="0" max="1" step="0.05"></label>
+    <label class="switch"><input id="bgm-enabled" type="checkbox"> BGM ON / OFF</label>
+    <label>SE 音量 <output id="se-output">70%</output><input id="se-volume" type="range" min="0" max="1" step="0.05"></label>
+    <p class="audio-hint" id="audio-hint">主要音樂檔：assets/audio/bgm/main-theme.mp3</p>
+  </div></form></dialog>
+  <dialog class="modal" id="status-modal"><form method="dialog"><header><h2>調查狀態</h2><button value="cancel" aria-label="關閉">×</button></header><div id="status-content"></div></form></dialog>
+  <dialog class="modal ending-modal" id="ending-modal"><form method="dialog"><p class="kicker">Story complete</p><h2>故事完結</h2><p>本次抵達結局</p><strong id="ending-name"></strong><div><button id="ending-title" value="cancel">返回標題</button></div></form></dialog>
+
+  <script src="../data/story-data.js"></script>
+  <script src="../js/save.js"></script>
+  <script src="../js/audio.js"></script>
+  <script src="../js/game-engine.js"></script>
+  <script src="../js/game-ui.js"></script>
+  <script src="../js/game.js"></script>
+</body>
+</html>
